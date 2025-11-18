@@ -22,3 +22,5 @@ class SymtomCheckerView extends GetView<SymtomCheckerController> {
     );
   }
 }
+
+//Hilma Salman Maulana (202210370311174)

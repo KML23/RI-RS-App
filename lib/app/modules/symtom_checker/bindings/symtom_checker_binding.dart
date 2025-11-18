@@ -10,3 +10,6 @@ class SymtomCheckerBinding extends Bindings {
     );
   }
 }
+
+
+//Hilma Salman Maulana (202210370311160)
