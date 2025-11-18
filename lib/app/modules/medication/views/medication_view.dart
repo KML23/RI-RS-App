@@ -23,4 +23,4 @@ class MedicationView extends GetView<MedicationController> {
   }
 }
 
-//Kemaldin Ahmada Syah - 160
+//Kemaldin Ahmada Syah - 202210370311160
