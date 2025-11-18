@@ -22,4 +22,5 @@ class MedicationView extends GetView<MedicationController> {
     );
   }
 }
+
 //Kemaldin Ahmada Syah - 160

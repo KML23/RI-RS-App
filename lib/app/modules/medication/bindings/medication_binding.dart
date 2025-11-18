@@ -10,4 +10,5 @@ class MedicationBinding extends Bindings {
     );
   }
 }
+
 //Kemaldin Ahmada Syah - 160

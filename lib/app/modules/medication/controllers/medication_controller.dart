@@ -21,4 +21,5 @@ class MedicationController extends GetxController {
 
   void increment() => count.value++;
 }
+
 //Kemaldin Ahmada Syah - 160
