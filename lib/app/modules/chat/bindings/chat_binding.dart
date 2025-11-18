@@ -1,3 +1,4 @@
+//T. M. DHABIT TARIM(177)
 import 'package:get/get.dart';
 
 import '../controllers/chat_controller.dart';
@@ -10,3 +11,5 @@ class ChatBinding extends Bindings {
     );
   }
 }
+
+//T. M. DHABIT TARIM(177)

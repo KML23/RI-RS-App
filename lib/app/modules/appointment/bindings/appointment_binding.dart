@@ -10,3 +10,7 @@ class AppointmentBinding extends Bindings {
     );
   }
 }
+
+
+// verry noveraldy 
+// 202210370311182
