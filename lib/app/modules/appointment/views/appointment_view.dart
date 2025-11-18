@@ -15,10 +15,13 @@ class AppointmentView extends GetView<AppointmentController> {
       ),
       body: const Center(
         child: Text(
-          'AppointmentView is working',
+          'mencoba commit dengan nama Verry Noveraldy',
           style: TextStyle(fontSize: 20),
         ),
       ),
     );
   }
 }
+
+// verry noveraldy 
+// 202210370311182
