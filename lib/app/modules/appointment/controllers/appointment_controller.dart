@@ -22,5 +22,4 @@ class AppointmentController extends GetxController {
   void increment() => count.value++;
 }
 
-// verry noveraldy 
-// 202210370311182
+

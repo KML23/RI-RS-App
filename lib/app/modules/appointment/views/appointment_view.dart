@@ -23,5 +23,3 @@ class AppointmentView extends GetView<AppointmentController> {
   }
 }
 
-// verry noveraldy 
-// 202210370311182

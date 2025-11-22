@@ -1,25 +1,65 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class MedicationController extends GetxController {
-  //TODO: Implement MedicationController
+  // 0 = Reminder, 1 = List, 2 = Detail
+  var viewState = 0.obs; 
 
-  final count = 0.obs;
-  @override
-  void onInit() {
-    super.onInit();
+  // Data Dummy (Sama seperti sebelumnya)
+  final List<Map<String, dynamic>> medicationList = [
+    {
+      "name": "PARACETAMOL 500mg",
+      "schedules": [
+        {"time": "Pagi (08.00)", "taken": true},
+        {"time": "Siang (14.00)", "taken": true},
+        {"time": "Malam (20.00)", "taken": false},
+      ]
+    },
+    {
+      "name": "Amlodipin 10mg",
+      "schedules": [{"time": "Pagi (08.00)", "taken": true}]
+    },
+    {
+      "name": "Panadol 10mg",
+      "schedules": [{"time": "Pagi (08.00)", "taken": true}]
+    },
+    {
+      "name": "Vitamin 10mg",
+      "schedules": [{"time": "Malam (20.00)", "taken": true}]
+    },
+  ];
+
+  // --- Actions ---
+
+  void markAsTaken() {
+    // Masuk ke tampilan List
+    viewState.value = 1; 
+    
+    if (Get.context != null) {
+       ScaffoldMessenger.of(Get.context!).showSnackBar(
+        const SnackBar(content: Text("Obat diminum"), backgroundColor: Colors.green),
+      );
+    }
   }
 
-  @override
-  void onReady() {
-    super.onReady();
+  void snoozeReminder() {
+    // Masuk ke tampilan List
+    viewState.value = 1;
   }
 
-  @override
-  void onClose() {
-    super.onClose();
+  void showDetail(String medicineName) {
+    // Masuk ke tampilan Detail
+    // (Bisa ditambahkan logika cek nama obat disini, tapi kita buat simpel dulu)
+    viewState.value = 2; 
   }
 
-  void increment() => count.value++;
+  void backToList() {
+    // Kembali ke tampilan List
+    viewState.value = 1;
+  }
+  
+  void backToReminder() {
+    // Reset ke awal (opsional untuk debug)
+    viewState.value = 0;
+  }
 }
-
-//Kemaldin Ahmada Syah - 202210370311160

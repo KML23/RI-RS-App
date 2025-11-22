@@ -10,4 +10,3 @@ class MedicationBinding extends Bindings {
     );
   }
 }
-//Kemaldin Ahmada Syah - 202210370311160
