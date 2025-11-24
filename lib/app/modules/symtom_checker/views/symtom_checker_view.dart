@@ -2,8 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/symtom_checker_controller.dart';
-import '../../../routes/app_pages.dart'; 
-
+import '../../../routes/app_pages.dart';
 
 // HMW4a: HALAMAN UTAMA (DAFTAR GEJALA)
 class SymtomCheckerView extends GetView<SymtomCheckerController> {
@@ -94,7 +93,6 @@ class SymtomCheckerView extends GetView<SymtomCheckerController> {
     
     return Column(
       children: [
-        // Induk Checkbox
         Row(
           children: [
             SizedBox(
@@ -199,6 +197,7 @@ class SymtomCheckerView extends GetView<SymtomCheckerController> {
 }
 
 
+
 // HMW4b: HALAMAN PILIHAN KONDISI (NORMAL vs BAHAYA)
 class SymptomDetailView extends StatelessWidget {
   final Map<String, dynamic> data;
@@ -240,35 +239,10 @@ class SymptomDetailView extends StatelessWidget {
             const SizedBox(height: 20),
 
             // Card 1: Tampilan Normal
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(15),
-                boxShadow: [BoxShadow(color: Colors.grey.withOpacity(0.1), blurRadius: 10)],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text("Tampilan Normal / Ringan", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                  const SizedBox(height: 10),
-                  Text("[Foto ${data['name']} biasa]", style: const TextStyle(color: Colors.grey)),
-                  const SizedBox(height: 5),
-                  Text("• ${data['desc_normal']}", style: const TextStyle(fontSize: 13)),
-                  const SizedBox(height: 15),
-                  const Text("Lihat detail →", style: TextStyle(fontWeight: FontWeight.bold)),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 20),
-
-            // Card 2: Perlu Diwaspadai (Tombol ke HMW4c)
-            GestureDetector(
+            InkWell(
               onTap: () {
                 Get.find<SymtomCheckerController>().resetImage();
-                Get.to(() => SymptomActionView(data: data));
+                Get.to(() => SymptomActionView(data: data, isDanger: false));
               },
               child: Container(
                 width: double.infinity,
@@ -277,6 +251,39 @@ class SymptomDetailView extends StatelessWidget {
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(15),
                   boxShadow: [BoxShadow(color: Colors.grey.withOpacity(0.1), blurRadius: 10)],
+                  border: Border.all(color: Colors.green.withOpacity(0.3)), // Border hijau
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text("Tampilan Normal / Ringan", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                    const SizedBox(height: 10),
+                    Text("[Foto ${data['name']} biasa]", style: const TextStyle(color: Colors.grey)),
+                    const SizedBox(height: 5),
+                    Text("• ${data['desc_normal']}", style: const TextStyle(fontSize: 13)),
+                    const SizedBox(height: 15),
+                    const Text("Lihat detail →", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.green)),
+                  ],
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            // Card 2: Perlu Diwaspadai
+            InkWell(
+              onTap: () {
+                Get.find<SymtomCheckerController>().resetImage();
+                Get.to(() => SymptomActionView(data: data, isDanger: true));
+              },
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(15),
+                  boxShadow: [BoxShadow(color: Colors.grey.withOpacity(0.1), blurRadius: 10)],
+                  border: Border.all(color: Colors.red.withOpacity(0.3)), 
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -287,7 +294,7 @@ class SymptomDetailView extends StatelessWidget {
                     const SizedBox(height: 5),
                     Text("• ${data['desc_danger']}", style: const TextStyle(fontSize: 13)),
                     const SizedBox(height: 15),
-                    const Text("Lihat detail →", style: TextStyle(fontWeight: FontWeight.bold)),
+                    const Text("Lihat detail →", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
                   ],
                 ),
               ),
@@ -301,13 +308,28 @@ class SymptomDetailView extends StatelessWidget {
 }
 
 
-// HMW4c: HALAMAN ACTION & UPLOAD FOTO
+
+// HMW4c: HALAMAN ACTION & UPLOAD FOTO (DYNAMIC)
 class SymptomActionView extends GetView<SymtomCheckerController> {
   final Map<String, dynamic> data;
-  const SymptomActionView({super.key, required this.data});
+  final bool isDanger;
+
+  const SymptomActionView({super.key, required this.data, required this.isDanger});
 
   @override
   Widget build(BuildContext context) {
+    // [FIX] Logika pengambilan data berdasarkan isDanger
+    List<String> signsList = isDanger 
+        ? (data['danger_signs'] as List<String>? ?? ["Data tidak tersedia"]) 
+        : (data['normal_signs'] as List<String>? ?? ["Data tidak tersedia"]);
+        
+    List<String> actionsList = isDanger 
+        ? (data['danger_actions'] as List<String>? ?? ["Hubungi dokter"]) 
+        : (data['normal_actions'] as List<String>? ?? ["Pantau anak"]);
+
+    // Warna tema (Merah jika bahaya, Hijau jika normal)
+    final themeColor = isDanger ? Colors.red : Colors.green;
+
     return Scaffold(
       backgroundColor: const Color(0xFFF5F9FC),
       appBar: AppBar(
@@ -331,9 +353,9 @@ class SymptomActionView extends GetView<SymtomCheckerController> {
               "${data['name']}:",
               style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 16),
             ),
-            const Text(
-              "Perlu Diwaspadai",
-              style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 16),
+            Text(
+              isDanger ? "Perlu Diwaspadai" : "Normal / Ringan",
+              style: TextStyle(color: themeColor, fontWeight: FontWeight.bold, fontSize: 16),
             ),
           ],
         ),
@@ -357,12 +379,12 @@ class SymptomActionView extends GetView<SymtomCheckerController> {
                   ),
                   child: Obx(() {
                     if (controller.selectedImagePath.value.isEmpty) {
-                      return const Column(
+                      return Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.camera_alt, color: Colors.grey, size: 40),
-                          SizedBox(height: 10),
-                          Text("Foto / Video", style: TextStyle(color: Colors.grey)),
+                          Icon(Icons.camera_alt, color: themeColor.withOpacity(0.5), size: 40),
+                          const SizedBox(height: 10),
+                          const Text("Foto / Video", style: TextStyle(color: Colors.grey)),
                         ],
                       );
                     } else {
@@ -382,23 +404,25 @@ class SymptomActionView extends GetView<SymtomCheckerController> {
               const Divider(thickness: 1.5),
               const SizedBox(height: 20),
 
-              // DETAIL BAHAYA
-              const Text("Kondisi ini perlu diwaspadai:", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              // DETAIL (Dynamic Text)
+              Text(
+                isDanger ? "Kondisi ini perlu diwaspadai:" : "Ciri-ciri kondisi normal:", 
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)
+              ),
               const SizedBox(height: 10),
-              _buildBulletPoint("Disertai demam tinggi (>38°C)"),
-              _buildBulletPoint("Terlihat bintik berisi nanah atau cairan"),
-              _buildBulletPoint("Anak terlihat sangat lemas"),
+              ...signsList.map((text) => _buildBulletPoint(text, themeColor)),
               
               const SizedBox(height: 20),
               const Divider(thickness: 1.5),
               const SizedBox(height: 20),
 
-              // ACTION
-              const Text("Apa yang harus dilakukan?", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              // ACTION (Dynamic Text)
+              Text(
+                isDanger ? "Apa yang harus dilakukan?" : "Saran perawatan di rumah:", 
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)
+              ),
               const SizedBox(height: 10),
-              _buildBulletPoint("Hubungi Tim Perawat"),
-              _buildBulletPoint("Kirim foto untuk evaluasi (Klik kotak di atas)"),
-              _buildBulletPoint("Hubungi UGD terdekat"),
+              ...actionsList.map((text) => _buildBulletPoint(text, themeColor)),
             ],
           ),
         ),
@@ -407,21 +431,22 @@ class SymptomActionView extends GetView<SymtomCheckerController> {
     );
   }
 
-  Widget _buildBulletPoint(String text) {
+  Widget _buildBulletPoint(String text, Color color) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text("• ", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.grey)),
-          Expanded(child: Text(text, style: const TextStyle(color: Colors.grey, fontSize: 15))),
+          Icon(Icons.circle, size: 8, color: color),
+          const SizedBox(width: 10),
+          Expanded(child: Text(text, style: const TextStyle(color: Colors.black87, fontSize: 15))),
         ],
       ),
     );
   }
 }
 
-// Widget Bottom Navbar Dummy (Icon saja seperti di Figma)
+// Widget Bottom Navbar Dummy
 Widget _buildBottomNav() {
   return Container(
     height: 60,
