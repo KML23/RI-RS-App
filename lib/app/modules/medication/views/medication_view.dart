@@ -125,7 +125,7 @@ class MedicationView extends GetView<MedicationController> {
               Row(children: [
                   Expanded(child: ElevatedButton(onPressed: ()=>controller.markAsTaken(), style: ElevatedButton.styleFrom(backgroundColor: Color(0xFF28A745)), child: Text("SUDAH"))),
                   SizedBox(width: 10),
-                  Expanded(child: ElevatedButton(onPressed: ()=>controller.snoozeReminder(), style: ElevatedButton.styleFrom(backgroundColor: Color(0xFFB00020)), child: Text("TUNDA"))),
+                  Expanded(child: ElevatedButton(onPressed: ()=>controller.snoozeReminder(), style: ElevatedButton.styleFrom(backgroundColor: Color(0xFFB00020)), child: Text("TUNDA 10 MENIT"))),
               ])
             ],
           ),
@@ -288,9 +288,9 @@ class MedicationView extends GetView<MedicationController> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    _buildStatusItem("08.00", 1), // 1 = Checked
+                    _buildStatusItem("08.00", 1), 
                     _buildStatusItem("14.05", 1),
-                    _buildStatusItem("20.00", 0), // 0 = Strip
+                    _buildStatusItem("20.00", 0), 
                   ],
                 ),
                 
@@ -304,10 +304,10 @@ class MedicationView extends GetView<MedicationController> {
                 const SizedBox(height: 15),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.start, // Agar 'Terlewat' tidak merusak alignment
+                  crossAxisAlignment: CrossAxisAlignment.start, 
                   children: [
                     _buildStatusItem("08.00", 1),
-                    _buildStatusItem("14.05", 2), // 2 = Missed (Silang Merah)
+                    _buildStatusItem("14.05", 2), 
                     _buildStatusItem("20.00", 1),
                   ],
                 ),
