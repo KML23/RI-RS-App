@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import '../modules/appointment/bindings/appointment_binding.dart';
 import '../modules/appointment/views/appointment_view.dart';
 import '../modules/chat/bindings/chat_binding.dart';
-import '../modules/chat/views/chat_view.dart';
+import '../modules/chat/views/chat_home_view.dart';
 import '../modules/education/bindings/education_binding.dart';
 import '../modules/education/views/education_view.dart';
 import '../modules/home/bindings/home_binding.dart';
@@ -22,7 +22,7 @@ part 'app_routes.dart';
 class AppPages {
   AppPages._();
 
-  static const INITIAL = Routes.LOGIN;
+  static const INITIAL = Routes.CHAT;
 
   static final routes = [
     GetPage(
@@ -42,7 +42,7 @@ class AppPages {
     ),
     GetPage(
       name: _Paths.CHAT,
-      page: () => const ChatView(),
+      page: () => const ChatHomeView(),
       binding: ChatBinding(),
     ),
     GetPage(
