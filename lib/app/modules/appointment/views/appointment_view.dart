@@ -127,7 +127,6 @@ class AppointmentView extends GetView<AppointmentController> {
           ],
         ),
       ),
-      // Navigasi Bawah
       bottomNavigationBar: Container(
         height: 70,
         decoration: const BoxDecoration(
