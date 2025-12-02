@@ -106,17 +106,34 @@ class ChatController extends GetxController {
   }
 
   // --- Simulasi Respon AI ---
-  void _simulateAIResponse(String query) async {
+void _simulateAIResponse(String query) async {
     isTyping.value = true;
     _scrollToBottom();
     
     await Future.delayed(const Duration(seconds: 2));
     
-    if (isClosed) return; // Cek apakah controller masih hidup
+    if (isClosed) return; 
     isTyping.value = false;
 
+    String response = "";
+    String lowerQuery = query.toLowerCase();
+
+    // 1. LOGIKA TRIASE SEDERHANA
+    if (lowerQuery.contains("sakit") || lowerQuery.contains("nyeri") || lowerQuery.contains("darah")) {
+      response = "Saya mendeteksi keluhan nyeri atau pendarahan. Sebaiknya ini diperiksa oleh tim medis. Silakan tekan tombol 'Bicara dengan Perawat' di bawah untuk terhubung langsung.";
+    } 
+    else if (lowerQuery.contains("jadwal") || lowerQuery.contains("kapan")) {
+      response = "Untuk jadwal kontrol dan minum obat, Anda bisa melihatnya di menu 'Jadwal Obat' atau 'Janji Temu' di halaman depan.";
+    }
+    else if (lowerQuery.contains("gatal") || lowerQuery.contains("kering")) {
+       response = "Rasa gatal ringan pada bekas jahitan adalah bagian normal dari proses penyembuhan. Pastikan area tersebut tetap kering dan bersih.";
+    }
+    else {
+      response = "Maaf, saya kurang mengerti. Bisa jelaskan lebih detail gejalanya? Atau hubungi perawat jika mendesak.";
+    }
+
     messages.add(ChatMessage(
-      text: "Tentu, rasa gatal ringan pada bekas jahitan adalah bagian normal dari proses penyembuhan. Pastikan area tersebut kering dan bersih.",
+      text: response,
       sender: ChatSender.ai,
       time: DateTime.now(),
     ));

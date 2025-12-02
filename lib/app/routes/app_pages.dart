@@ -22,7 +22,7 @@ part 'app_routes.dart';
 class AppPages {
   AppPages._();
 
-  static const INITIAL = Routes.CHAT;
+  static const INITIAL = Routes.SYMTOM_CHECKER;
 
   static final routes = [
     GetPage(
