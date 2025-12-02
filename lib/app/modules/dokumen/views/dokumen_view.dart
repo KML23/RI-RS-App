@@ -69,13 +69,14 @@ class DokumenView extends GetView<DokumenController> {
                         ),
                       ),
                       const SizedBox(width: 15),
-                      // Tombol 2: Kamera (Putih/Outline)
+                      // --- PERUBAHAN DI SINI ---
+                      // Tombol 2: Kamera (Sekarang Biru Solid)
                       Expanded(
                         child: _buildUploadButton(
                           label: "Ambil foto dokumen",
                           icon: Icons.camera_alt_outlined,
-                          color: Colors.black87,
-                          isOutline: true,
+                          color: primaryBlue, // Warna Biru
+                          isOutline: false, // Solid, bukan outline
                           onTap: () => controller.pickFromCamera(),
                         ),
                       ),
