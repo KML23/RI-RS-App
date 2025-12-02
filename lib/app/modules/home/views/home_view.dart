@@ -7,7 +7,6 @@ class HomeView extends GetView<HomeController> {
 
   @override
   Widget build(BuildContext context) {
-    // Palet Warna Konsisten
     final Color bgPage = const Color(0xFFF5F9FC);
     final Color primaryBlue = const Color(0xFF007BFF);
 
@@ -49,7 +48,6 @@ class HomeView extends GetView<HomeController> {
                       ),
                     ],
                   ),
-                  // Avatar Profile
                   Container(
                     width: 50,
                     height: 50,
@@ -58,7 +56,6 @@ class HomeView extends GetView<HomeController> {
                       color: Colors.white,
                       border: Border.all(color: Colors.grey.shade200),
                       image: const DecorationImage(
-                        // Placeholder image
                         image: NetworkImage('https://i.pravatar.cc/150?img=12'),
                         fit: BoxFit.cover,
                       ),
@@ -112,7 +109,7 @@ class HomeView extends GetView<HomeController> {
                           ),
                           const SizedBox(height: 15),
                           ElevatedButton(
-                            onPressed: () {}, // Bisa ke halaman detail riwayat
+                            onPressed: () {},
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.white,
                               foregroundColor: primaryBlue,
@@ -131,7 +128,6 @@ class HomeView extends GetView<HomeController> {
                         ],
                       ),
                     ),
-                    // Ilustrasi/Icon Besar
                     Icon(
                       Icons.favorite_border,
                       size: 80,
@@ -158,26 +154,60 @@ class HomeView extends GetView<HomeController> {
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3, // 3 kolom
+                  crossAxisCount: 3,
                   crossAxisSpacing: 15,
                   mainAxisSpacing: 15,
-                  childAspectRatio: 0.85, // Mengatur tinggi kotak
+                  childAspectRatio: 0.85,
                 ),
                 itemCount: controller.menus.length,
                 itemBuilder: (context, index) {
                   final menu = controller.menus[index];
-                  return _buildMenuCard(
-                    title: menu['title'],
-                    icon: menu['icon'],
-                    color: menu['color'],
+                  return GestureDetector(
                     onTap: () => Get.toNamed(menu['route']),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.05),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: menu['color'].withOpacity(0.1),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(menu['icon'],
+                                color: menu['color'], size: 28),
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            menu['title'],
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 13,
+                              color: Colors.black87,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   );
                 },
               ),
 
               const SizedBox(height: 30),
 
-              // --- 4. AREA LAINNYA (LOGOUT / AKUN) ---
+              // --- 4. AREA LAINNYA ---
               ListTile(
                 onTap: () => controller.logout(),
                 contentPadding: EdgeInsets.zero,
@@ -204,8 +234,6 @@ class HomeView extends GetView<HomeController> {
           ),
         ),
       ),
-
-      // Bottom Nav (Opsional jika ingin tetap ada di Home)
       bottomNavigationBar: Container(
         height: 70,
         decoration: const BoxDecoration(
@@ -219,60 +247,10 @@ class HomeView extends GetView<HomeController> {
               Icons.home_filled,
               size: 30,
               color: Color(0xFF007BFF),
-            ), // Aktif
+            ),
             Icon(Icons.medication, size: 30, color: Colors.black38),
             Icon(Icons.notifications, size: 30, color: Colors.black38),
             Icon(Icons.person, size: 30, color: Colors.black38),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // Widget Card Menu Kecil
-  Widget _buildMenuCard({
-    required String title,
-    required IconData icon,
-    required Color color,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // Lingkaran Icon
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(icon, color: color, size: 28),
-            ),
-            const SizedBox(height: 12),
-            // Text Judul
-            Text(
-              title,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: 13,
-                color: Colors.black87,
-              ),
-            ),
           ],
         ),
       ),

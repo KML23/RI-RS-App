@@ -4,45 +4,46 @@ import '../../../routes/app_pages.dart';
 
 class HomeController extends GetxController {
   // Data Dummy User
-  final userName = "Bapak Manto";
+  final userName = "Bapak Sandy";
   final userRM = "20221037031147";
 
-  // Daftar Menu Utama
-  // Kita simpan di sini agar mudah diedit/ditambah
+  // Note: List 'carePlan' SUDAH DIHAPUS agar tampilan Home lebih bersih.
+
+  // Daftar Menu Utama (Diupdate)
   final List<Map<String, dynamic>> menus = [
     {
       "title": "Cek Gejala",
       "icon": Icons.medical_services_outlined,
-      "color": Color(0xFFFF6B6B), // Merah soft
+      "color": const Color(0xFFFF6B6B), 
       "route": Routes.SYMTOM_CHECKER,
     },
     {
       "title": "Jadwal Obat",
       "icon": Icons.medication_liquid_outlined,
-      "color": Color(0xFF4ECDC4), // Tosca
+      "color": const Color(0xFF4ECDC4), 
       "route": Routes.MEDICATION,
     },
     {
       "title": "Janji Temu",
       "icon": Icons.calendar_month_outlined,
-      "color": Color(0xFF1A535C), // Biru tua
+      "color": const Color(0xFF1A535C), 
       "route": Routes.APPOINTMENT,
     },
     {
       "title": "Konsultasi",
       "icon": Icons.chat_bubble_outline,
-      "color": Color(0xFF6A0572), // Ungu
+      "color": const Color(0xFF6A0572), 
       "route": Routes.CHAT,
     },
     {
-      "title": "Edukasi",
-      "icon": Icons.menu_book_outlined,
-      "color": Color(0xFFFFA600), // Oranye
-      "route": Routes.EDUCATION,
+      // MENU BARU: Menggantikan List Rencana Perawatan
+      "title": "Panduan", 
+      "icon": Icons.menu_book_outlined, // Icon buku panduan
+      "color": const Color(0xFFFFA600), 
+      "route": Routes.EDUCATION, 
     },
   ];
 
-  // Navigasi ke halaman Login/Register (Untuk demo logout)
   void logout() {
     Get.offAllNamed(Routes.LOGIN);
   }
