@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/appointment_controller.dart';
-import '../../../routes/app_pages.dart'; // Import routes untuk navigasi bottom bar jika perlu
+import '../../../routes/app_pages.dart';
 
 class AppointmentView extends GetView<AppointmentController> {
   const AppointmentView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // Warna Background sesuai gambar (kebiruan muda/abu muda)
     final Color bgColor = const Color(0xFFEEF2F5);
     final Color blueLink = const Color(0xFF2F80ED);
 
@@ -70,7 +69,6 @@ class AppointmentView extends GetView<AppointmentController> {
                     ),
                   ),
                   const SizedBox(height: 15),
-                  // Tanggal
                   Row(
                     children: [
                       const Icon(
@@ -90,7 +88,6 @@ class AppointmentView extends GetView<AppointmentController> {
                     ],
                   ),
                   const SizedBox(height: 10),
-                  // Jam
                   Row(
                     children: [
                       const Icon(
@@ -112,18 +109,14 @@ class AppointmentView extends GetView<AppointmentController> {
                 ],
               ),
             ),
-
             const SizedBox(height: 25),
-
-            // --- JUDUL SECTION ---
             Text(
               "Kontrol dengan ${controller.doctorName}",
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
             ),
-
             const SizedBox(height: 15),
 
-            // --- LIST TUGAS (Dynamic Rendering) ---
+            // --- LIST TUGAS ---
             Obx(
               () => Column(
                 children: controller.preparationList.map((item) {
@@ -134,8 +127,7 @@ class AppointmentView extends GetView<AppointmentController> {
           ],
         ),
       ),
-
-      // --- BOTTOM NAVIGATION BAR (Sesuai Gambar) ---
+      // Navigasi Bawah
       bottomNavigationBar: Container(
         height: 70,
         decoration: const BoxDecoration(
@@ -154,13 +146,12 @@ class AppointmentView extends GetView<AppointmentController> {
               onPressed: () => Get.offAllNamed(Routes.HOME),
             ),
             IconButton(
-              // Icon link/pill sesuai gambar
               icon: const Icon(
                 Icons.medication_outlined,
                 size: 30,
                 color: Colors.black87,
               ),
-              onPressed: () {},
+              onPressed: () => Get.toNamed(Routes.MEDICATION),
             ),
             IconButton(
               icon: const Icon(
@@ -199,10 +190,8 @@ class AppointmentView extends GetView<AppointmentController> {
         ],
       ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment
-            .start, // Agar icon tetap di atas jika teks panjang
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ICON CHECKBOX / RADIO
           Padding(
             padding: const EdgeInsets.only(top: 2.0),
             child: Icon(
@@ -214,28 +203,17 @@ class AppointmentView extends GetView<AppointmentController> {
             ),
           ),
           const SizedBox(width: 15),
-
-          // CONTENT TEKS
           Expanded(
             child: isDone
                 ? Text(
                     item['text'],
-                    style:
-                        TextStyle(
-                          color:
-                              Colors.grey[600], // Teks agak pudar jika selesai
-                          decoration: TextDecoration
-                              .underline, // Garis bawah sesuai gambar
-                          decorationColor: blueLink,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
-                          shadows: [
-                            Shadow(color: blueLink, offset: Offset(0, -2)),
-                          ], // Trick untuk underline warna biru tapi teks beda warna (opsional, simplenya pakai style biasa)
-                        ).copyWith(
-                          color: blueLink,
-                          decoration: TextDecoration.underline,
-                        ),
+                    style: TextStyle(
+                      color: blueLink,
+                      decoration: TextDecoration.underline,
+                      decorationColor: blueLink,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
                   )
                 : Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -256,12 +234,20 @@ class AppointmentView extends GetView<AppointmentController> {
                       const SizedBox(height: 10),
                       Align(
                         alignment: Alignment.centerRight,
-                        child: Text(
-                          item['actionText'],
-                          style: TextStyle(
-                            color: blueLink,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 13,
+                        // --- TOMBOL KLIK DI SINI ---
+                        child: GestureDetector(
+                          onTap: () {
+                            if (item.containsKey('route')) {
+                              Get.toNamed(item['route']);
+                            }
+                          },
+                          child: Text(
+                            item['actionText'],
+                            style: TextStyle(
+                              color: blueLink,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 13,
+                            ),
                           ),
                         ),
                       ),

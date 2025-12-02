@@ -5,22 +5,22 @@ import 'package:get/get.dart';
 import '../controllers/register_controller.dart';
 
 class RegisterView extends GetView<RegisterController> {
-  const RegisterView({Key? key}) : super(key: key);
+  const RegisterView({super.key});
 
   @override
   Widget build(BuildContext context) {
     // Warna & Style
     final Color primaryBlue = Color(0xFF007BFF);
-    
+
     return Scaffold(
       backgroundColor: const Color(0xFFF0F4F8),
       appBar: AppBar(
         backgroundColor: const Color(0xFFF0F4F8),
         elevation: 0,
         // Matikan leading bawaan agar tidak ada batasan lebar yang kaku
-        automaticallyImplyLeading: false, 
+        automaticallyImplyLeading: false,
         // Beri jarak sedikit dari pinggir layar
-        titleSpacing: 20, 
+        titleSpacing: 20,
         title: Row(
           children: [
             // --- 1. TOMBOL KEMBALI (ICON + TEKS) ---
@@ -28,21 +28,23 @@ class RegisterView extends GetView<RegisterController> {
             GestureDetector(
               onTap: () => controller.backButton(),
               child: Row(
-                mainAxisSize: MainAxisSize.min, // Agar ukurannya seperlunya saja
+                mainAxisSize:
+                    MainAxisSize.min, // Agar ukurannya seperlunya saja
                 children: [
                   Icon(
-                    Icons.arrow_back_ios, 
+                    Icons.arrow_back_ios,
                     color: Color(0xFF007BFF), // primaryBlue
-                    size: 18
+                    size: 18,
                   ),
                   // Tidak perlu SizedBox lebar-lebar, cukup nempel atau dikit aja
-                  const SizedBox(width: 2), 
+                  const SizedBox(width: 2),
                   Text(
                     "Kembali",
                     style: TextStyle(
                       color: Color(0xFF007BFF), // primaryBlue
                       fontSize: 14,
-                      fontWeight: FontWeight.w500 // Sedikit tebal biar enak dibaca
+                      fontWeight:
+                          FontWeight.w500, // Sedikit tebal biar enak dibaca
                     ),
                   ),
                 ],
@@ -50,21 +52,24 @@ class RegisterView extends GetView<RegisterController> {
             ),
 
             // --- 2. JARAK ANTARA KEMBALI & JUDUL ---
-            const SizedBox(width: 15), 
+            const SizedBox(width: 15),
 
             // --- 3. JUDUL HALAMAN ---
             // Bungkus dengan Flexible agar kalau layar kecil teks tidak overflow keluar layar kanan
-            Flexible( 
-              child: Obx(() => Text(
-                "Pendaftaran Akun (${controller.currentStep.value}/2)",
-                style: const TextStyle(
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
+            Flexible(
+              child: Obx(
+                () => Text(
+                  "Pendaftaran Akun (${controller.currentStep.value}/2)",
+                  style: const TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                  overflow:
+                      TextOverflow.ellipsis, // Titik-titik jika kepanjangan
+                  maxLines: 1,
                 ),
-                overflow: TextOverflow.ellipsis, // Titik-titik jika kepanjangan
-                maxLines: 1,
-              )),
+              ),
             ),
           ],
         ),
@@ -110,7 +115,10 @@ class RegisterView extends GetView<RegisterController> {
         const SizedBox(height: 30),
 
         // Input RM
-        const Text("Nomor Rekam Medis :", style: TextStyle(fontWeight: FontWeight.bold)),
+        const Text(
+          "Nomor Rekam Medis :",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         const SizedBox(height: 8),
         TextField(
           controller: controller.rmC,
@@ -120,15 +128,18 @@ class RegisterView extends GetView<RegisterController> {
         const SizedBox(height: 20),
 
         // Input Tanggal Lahir
-        const Text("Tanggal Lahir", style: TextStyle(fontWeight: FontWeight.bold)),
+        const Text(
+          "Tanggal Lahir",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         const SizedBox(height: 8),
         TextField(
           controller: controller.dobC,
           readOnly: true, // Tidak bisa diketik manual
           onTap: () => controller.selectDate(Get.context!),
-          decoration: _inputDecoration("DD / MM / YYYY").copyWith(
-            suffixIcon: Icon(Icons.calendar_month, color: color),
-          ),
+          decoration: _inputDecoration(
+            "DD / MM / YYYY",
+          ).copyWith(suffixIcon: Icon(Icons.calendar_month, color: color)),
         ),
 
         const SizedBox(height: 40),
@@ -176,7 +187,11 @@ class RegisterView extends GetView<RegisterController> {
         // Pesan Berhasil
         RichText(
           text: const TextSpan(
-            style: TextStyle(color: Colors.black, fontSize: 14, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+            ),
             children: [
               TextSpan(text: "Verifikasi Berhasil!!\n"),
               TextSpan(text: "Selamat Datang, \"Bapak Manto\".\n"),
@@ -187,34 +202,54 @@ class RegisterView extends GetView<RegisterController> {
         const SizedBox(height: 30),
 
         // Input Password Baru
-        const Text("Buat Password Aplikasi :", style: TextStyle(fontWeight: FontWeight.bold)),
+        const Text(
+          "Buat Password Aplikasi :",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         const SizedBox(height: 8),
-        Obx(() => TextField(
-          controller: controller.passC,
-          obscureText: controller.isPassHidden.value,
-          decoration: _inputDecoration("Minimal 8 Karakter...").copyWith(
-            suffixIcon: IconButton(
-              icon: Icon(controller.isPassHidden.value ? Icons.visibility_off : Icons.visibility, color: color),
-              onPressed: () => controller.isPassHidden.toggle(),
+        Obx(
+          () => TextField(
+            controller: controller.passC,
+            obscureText: controller.isPassHidden.value,
+            decoration: _inputDecoration("Minimal 8 Karakter...").copyWith(
+              suffixIcon: IconButton(
+                icon: Icon(
+                  controller.isPassHidden.value
+                      ? Icons.visibility_off
+                      : Icons.visibility,
+                  color: color,
+                ),
+                onPressed: () => controller.isPassHidden.toggle(),
+              ),
             ),
           ),
-        )),
+        ),
 
         const SizedBox(height: 20),
 
         // Input Konfirmasi Password
-        const Text("Konfirmasi Password :", style: TextStyle(fontWeight: FontWeight.bold)),
+        const Text(
+          "Konfirmasi Password :",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         const SizedBox(height: 8),
-        Obx(() => TextField(
-          controller: controller.confirmPassC,
-          obscureText: controller.isConfirmHidden.value,
-          decoration: _inputDecoration("Ulangi Password Anda").copyWith(
-            suffixIcon: IconButton(
-              icon: Icon(controller.isConfirmHidden.value ? Icons.visibility_off : Icons.visibility, color: color),
-              onPressed: () => controller.isConfirmHidden.toggle(),
+        Obx(
+          () => TextField(
+            controller: controller.confirmPassC,
+            obscureText: controller.isConfirmHidden.value,
+            decoration: _inputDecoration("Ulangi Password Anda").copyWith(
+              suffixIcon: IconButton(
+                icon: Icon(
+                  controller.isConfirmHidden.value
+                      ? Icons.visibility_off
+                      : Icons.visibility,
+                  color: color,
+                ),
+                onPressed: () => controller.isConfirmHidden.toggle(),
+              ),
             ),
           ),
-        )),
+        ),
 
         const SizedBox(height: 20),
 
@@ -222,15 +257,17 @@ class RegisterView extends GetView<RegisterController> {
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Obx(() => SizedBox(
-              height: 24,
-              width: 24,
-              child: Checkbox(
-                value: controller.isTermsAccepted.value,
-                activeColor: Colors.black,
-                onChanged: (val) => controller.isTermsAccepted.value = val!,
+            Obx(
+              () => SizedBox(
+                height: 24,
+                width: 24,
+                child: Checkbox(
+                  value: controller.isTermsAccepted.value,
+                  activeColor: Colors.black,
+                  onChanged: (val) => controller.isTermsAccepted.value = val!,
+                ),
               ),
-            )),
+            ),
             const SizedBox(width: 10),
             Expanded(
               child: const Text(
@@ -263,7 +300,11 @@ class RegisterView extends GetView<RegisterController> {
   InputDecoration _inputDecoration(String hint) {
     return InputDecoration(
       hintText: hint,
-      hintStyle: TextStyle(color: Colors.grey[600], fontSize: 14, fontStyle: FontStyle.italic),
+      hintStyle: TextStyle(
+        color: Colors.grey[600],
+        fontSize: 14,
+        fontStyle: FontStyle.italic,
+      ),
       filled: true,
       fillColor: const Color(0xFFE0E0E0),
       border: OutlineInputBorder(
