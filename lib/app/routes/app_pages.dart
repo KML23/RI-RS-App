@@ -26,8 +26,7 @@ part 'app_routes.dart';
 class AppPages {
   AppPages._();
 
-  // --- PERUBAHAN DI SINI ---
-  // Mengubah rute awal menjadi HOME untuk memberikan akses langsung ke dasbor utama.
+
   static const INITIAL = Routes.HOME;
 
   static final routes = [
