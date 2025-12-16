@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "680202233178",
+    "project_id": "ri-rs-28750",
+    "storage_bucket": "ri-rs-28750.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:680202233178:android:795dce9ffde2d16dd5bf63",
+        "android_client_info": {
+          "package_name": "com.example.mobilers"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDY4ffbqL5OJO2nPXQrXkP9EmD3iD6lucI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
