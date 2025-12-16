@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../routes/app_pages.dart';
 
 class HomeController extends GetxController {
-  // Data Dummy User
-  final userName = "Bapak Sandy";
-  final userRM = "20221037031147";
+  // Data User (Sekarang Reactive .obs)
+  var userName = "Memuat...".obs;
+  var userRM = "...".obs;
 
-  // Note: List 'carePlan' SUDAH DIHAPUS agar tampilan Home lebih bersih.
-
-  // Daftar Menu Utama (Diupdate)
+  // Daftar Menu Utama
   final List<Map<String, dynamic>> menus = [
     {
       "title": "Cek Gejala",
@@ -36,15 +36,44 @@ class HomeController extends GetxController {
       "route": Routes.CHAT,
     },
     {
-      // MENU BARU: Menggantikan List Rencana Perawatan
       "title": "Panduan", 
-      "icon": Icons.menu_book_outlined, // Icon buku panduan
+      "icon": Icons.menu_book_outlined,
       "color": const Color(0xFFFFA600), 
       "route": Routes.EDUCATION, 
     },
   ];
 
-  void logout() {
+  @override
+  void onInit() {
+    super.onInit();
+    // Panggil fungsi ambil data user saat Controller dibuat
+    fetchUserProfile();
+  }
+
+  // Fungsi ambil data profil dari Firestore
+  void fetchUserProfile() async {
+    User? currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser != null) {
+      try {
+        DocumentSnapshot userDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(currentUser.uid)
+            .get();
+
+        if (userDoc.exists) {
+          var data = userDoc.data() as Map<String, dynamic>;
+          userName.value = data['name'] ?? "User";
+          userRM.value = data['rm'] ?? "-";
+        }
+      } catch (e) {
+        print("Gagal ambil data user: $e");
+        userName.value = "User (Offline)";
+      }
+    }
+  }
+
+  void logout() async {
+    await FirebaseAuth.instance.signOut();
     Get.offAllNamed(Routes.LOGIN);
   }
 }
