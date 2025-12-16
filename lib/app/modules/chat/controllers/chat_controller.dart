@@ -177,3 +177,4 @@ void _simulateAIResponse(String query) async {
 }
 
 //pengaturan backend chat bisa diatur di file chat_service.dart
+//Kemaldin Ahmada Syah 202210370311160
