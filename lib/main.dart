@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart'; // Wajib import ini
+import 'package:get/get.dart';
+import 'package:firebase_core/firebase_core.dart'; // Tambahan Import
+import 'app/routes/app_pages.dart';
+import 'firebase_options.dart'; // File ini dibuat otomatis oleh flutterfire configure
 
-import 'app/routes/app_pages.dart'; // Sesuaikan dengan lokasi file routes Anda
+void main() async {
+  // Pastikan binding flutter terinisialisasi sebelum memanggil kode native (Firebase)
+  WidgetsFlutterBinding.ensureInitialized();
 
-void main() {
+  // Inisialisasi Firebase
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
   runApp(const MyApp());
 }
 
@@ -12,7 +19,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // PERHATIKAN: Harus 'GetMaterialApp', BUKAN 'MaterialApp' biasa
     return GetMaterialApp(
       title: "Asisten Kesehatan",
       initialRoute: AppPages.INITIAL,
