@@ -30,22 +30,25 @@ class HomeView extends GetView<HomeController> {
                         style: TextStyle(color: Colors.grey, fontSize: 14),
                       ),
                       const SizedBox(height: 4),
-                      Text(
-                        controller.userName,
+                      
+                      // Menggunakan Obx agar UI update otomatis saat data Firebase termuat
+                      Obx(() => Text(
+                        controller.userName.value,
                         style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                           color: Colors.black87,
                         ),
-                      ),
-                      Text(
-                        "RM: ${controller.userRM}",
+                      )),
+                      
+                      Obx(() => Text(
+                        "RM: ${controller.userRM.value}",
                         style: TextStyle(
                           color: primaryBlue,
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
                         ),
-                      ),
+                      )),
                     ],
                   ),
                   Container(
