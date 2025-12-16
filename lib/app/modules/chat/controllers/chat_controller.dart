@@ -175,3 +175,5 @@ void _simulateAIResponse(String query) async {
     return DateFormat('HH:mm').format(time);
   }
 }
+
+//pengaturan backend chat bisa diatur di file chat_service.dart
