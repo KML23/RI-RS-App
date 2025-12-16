@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import '../controllers/login_controller.dart';
 
 class LoginView extends GetView<LoginController> {
-  const LoginView({Key? key}) : super(key: key);
+  const LoginView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +14,7 @@ class LoginView extends GetView<LoginController> {
 
     return Scaffold(
       // Warna background agak kebiruan/putih sesuai gambar
-      backgroundColor: Color(0xFFF0F4F8), 
+      backgroundColor: Color(0xFFF0F4F8),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 30),
@@ -73,7 +73,10 @@ class LoginView extends GetView<LoginController> {
                     borderRadius: BorderRadius.circular(30), // Rounded pills
                     borderSide: BorderSide.none,
                   ),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 16,
+                  ),
                 ),
               ),
 
@@ -89,33 +92,40 @@ class LoginView extends GetView<LoginController> {
               ),
               const SizedBox(height: 8),
               // Menggunakan Obx karena obscureText berubah-ubah
-              Obx(() => TextField(
-                controller: controller.passC,
-                obscureText: controller.isPasswordHidden.value, // Status hide/show
-                decoration: InputDecoration(
-                  hintText: "Masukkan Password Anda",
-                  hintStyle: TextStyle(color: Colors.grey[600], fontSize: 14),
-                  filled: true,
-                  fillColor: bgInput,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30),
-                    borderSide: BorderSide.none,
-                  ),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                  // Icon Mata (Visibility Toggle)
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      controller.isPasswordHidden.value
-                          ? Icons.visibility_off // Icon mata silang
-                          : Icons.visibility,    // Icon mata terbuka
-                      color: primaryBlue,
+              Obx(
+                () => TextField(
+                  controller: controller.passC,
+                  obscureText:
+                      controller.isPasswordHidden.value, // Status hide/show
+                  decoration: InputDecoration(
+                    hintText: "Masukkan Password Anda",
+                    hintStyle: TextStyle(color: Colors.grey[600], fontSize: 14),
+                    filled: true,
+                    fillColor: bgInput,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30),
+                      borderSide: BorderSide.none,
                     ),
-                    onPressed: () {
-                      controller.togglePasswordVisibility();
-                    },
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 16,
+                    ),
+                    // Icon Mata (Visibility Toggle)
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        controller.isPasswordHidden.value
+                            ? Icons
+                                  .visibility_off // Icon mata silang
+                            : Icons.visibility, // Icon mata terbuka
+                        color: primaryBlue,
+                      ),
+                      onPressed: () {
+                        controller.togglePasswordVisibility();
+                      },
+                    ),
                   ),
                 ),
-              )),
+              ),
 
               // --- 5. FORGOT PASSWORD ---
               Align(
@@ -125,9 +135,9 @@ class LoginView extends GetView<LoginController> {
                   child: Text(
                     "Lupa Password",
                     style: TextStyle(
-                      color: Colors.black, 
+                      color: Colors.black,
                       fontStyle: FontStyle.italic,
-                      fontSize: 12
+                      fontSize: 12,
                     ),
                   ),
                 ),
@@ -151,10 +161,7 @@ class LoginView extends GetView<LoginController> {
                   ),
                   child: const Text(
                     "MASUK",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                   ),
                 ),
               ),
@@ -181,7 +188,7 @@ class LoginView extends GetView<LoginController> {
                   ],
                 ),
               ),
-              
+
               const SizedBox(height: 20),
             ],
           ),

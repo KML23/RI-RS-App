@@ -4,10 +4,14 @@ import '../modules/appointment/bindings/appointment_binding.dart';
 import '../modules/appointment/views/appointment_view.dart';
 import '../modules/chat/bindings/chat_binding.dart';
 import '../modules/chat/views/chat_home_view.dart';
+import '../modules/dokumen/bindings/dokumen_binding.dart';
+import '../modules/dokumen/views/dokumen_view.dart';
 import '../modules/education/bindings/education_binding.dart';
 import '../modules/education/views/education_view.dart';
 import '../modules/home/bindings/home_binding.dart';
 import '../modules/home/views/home_view.dart';
+import '../modules/kuisioner/bindings/kuisioner_binding.dart';
+import '../modules/kuisioner/views/kuisioner_view.dart';
 import '../modules/login/bindings/login_binding.dart';
 import '../modules/login/views/login_view.dart';
 import '../modules/medication/bindings/medication_binding.dart';
@@ -22,7 +26,8 @@ part 'app_routes.dart';
 class AppPages {
   AppPages._();
 
-  static const INITIAL = Routes.SYMTOM_CHECKER;
+
+  static const INITIAL = Routes.LOGIN;
 
   static final routes = [
     GetPage(
@@ -64,6 +69,16 @@ class AppPages {
       name: _Paths.REGISTER,
       page: () => const RegisterView(),
       binding: RegisterBinding(),
+    ),
+    GetPage(
+      name: _Paths.KUISIONER,
+      page: () => const KuisionerView(),
+      binding: KuisionerBinding(),
+    ),
+    GetPage(
+      name: _Paths.DOKUMEN,
+      page: () => const DokumenView(),
+      binding: DokumenBinding(),
     ),
   ];
 }

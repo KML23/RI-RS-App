@@ -4,7 +4,7 @@ import '../controllers/chat_controller.dart';
 import 'chat_room_view.dart';
 
 class ChatHomeView extends GetView<ChatController> {
-  const ChatHomeView({Key? key}) : super(key: key);
+  const ChatHomeView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -14,8 +14,10 @@ class ChatHomeView extends GetView<ChatController> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text("Pusat Bantuan", 
-            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+        title: const Text(
+          "Pusat Bantuan",
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+        ),
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
@@ -38,9 +40,11 @@ class ChatHomeView extends GetView<ChatController> {
               ),
               child: Column(
                 children: [
-                  const Text("Punya pertanyaan seputar perawatan Anda?",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                  const Text(
+                    "Punya pertanyaan seputar perawatan Anda?",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                  ),
                   const SizedBox(height: 15),
                   TextField(
                     decoration: InputDecoration(
@@ -52,24 +56,30 @@ class ChatHomeView extends GetView<ChatController> {
                         borderRadius: BorderRadius.circular(10),
                         borderSide: BorderSide(color: Colors.grey.shade300),
                       ),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 15,
+                        vertical: 10,
+                      ),
                     ),
                     // Opsional: Bisa langsung kirim ke chat jika di-enter
                     onSubmitted: (val) {
                       if (val.isNotEmpty) {
-                        controller.messages.clear(); // Reset chat lama (opsional)
+                        controller.messages
+                            .clear(); // Reset chat lama (opsional)
                         controller.sendMessage(val);
                         Get.to(() => const ChatRoomView());
                       }
                     },
-                  )
+                  ),
                 ],
               ),
             ),
-            
+
             const SizedBox(height: 25),
-            const Text("Atau Pilih Salah Satu Opsi", 
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            const Text(
+              "Atau Pilih Salah Satu Opsi",
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            ),
             const SizedBox(height: 15),
 
             // --- Section 2: Tombol Pilihan (AI vs Perawat) ---
@@ -106,8 +116,10 @@ class ChatHomeView extends GetView<ChatController> {
             ),
 
             const SizedBox(height: 25),
-            const Text("Riwayat Percakapan Anda", 
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            const Text(
+              "Riwayat Percakapan Anda",
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            ),
             const SizedBox(height: 15),
 
             // --- Section 3: Riwayat (Dummy) ---
@@ -120,10 +132,10 @@ class ChatHomeView extends GetView<ChatController> {
   }
 
   Widget _buildOptionCard({
-    required IconData icon, 
-    required String title, 
-    required String subtitle, 
-    required VoidCallback onTap
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required VoidCallback onTap,
   }) {
     return InkWell(
       onTap: onTap,
@@ -135,14 +147,23 @@ class ChatHomeView extends GetView<ChatController> {
           color: Colors.white,
           border: Border.all(color: Colors.grey.shade300),
           borderRadius: BorderRadius.circular(12),
-          boxShadow: [BoxShadow(color: Colors.grey.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4))]
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
         child: Row(
           children: [
             Container(
               width: 50,
               height: 50,
-              decoration: BoxDecoration(color: Colors.blue.shade50, borderRadius: BorderRadius.circular(10)),
+              decoration: BoxDecoration(
+                color: Colors.blue.shade50,
+                borderRadius: BorderRadius.circular(10),
+              ),
               child: Center(child: Icon(icon, color: Colors.blue)),
             ),
             const SizedBox(width: 12),
@@ -151,9 +172,18 @@ class ChatHomeView extends GetView<ChatController> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  ),
                   const SizedBox(height: 4),
-                  Text(subtitle, style: const TextStyle(fontSize: 11, color: Colors.grey)),
+                  Text(
+                    subtitle,
+                    style: const TextStyle(fontSize: 11, color: Colors.grey),
+                  ),
                 ],
               ),
             ),
@@ -171,8 +201,14 @@ class ChatHomeView extends GetView<ChatController> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        boxShadow: [BoxShadow(color: Colors.grey.withOpacity(0.1), blurRadius: 5, offset: const Offset(0, 2))],
-        border: Border.all(color: Colors.grey.shade100)
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            blurRadius: 5,
+            offset: const Offset(0, 2),
+          ),
+        ],
+        border: Border.all(color: Colors.grey.shade100),
       ),
       child: Text(text, style: const TextStyle(fontWeight: FontWeight.w500)),
     );

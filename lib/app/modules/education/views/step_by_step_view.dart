@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class StepByStepView extends StatelessWidget {
-  final Map<String, dynamic> stepData; 
+  final Map<String, dynamic> stepData;
 
-  const StepByStepView({Key? key, required this.stepData}) : super(key: key);
+  const StepByStepView({super.key, required this.stepData});
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +13,11 @@ class StepByStepView extends StatelessWidget {
       appBar: AppBar(
         title: Text(
           stepData['title'],
-          style: const TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold)
+          style: const TextStyle(
+            color: Colors.black,
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -27,7 +31,14 @@ class StepByStepView extends StatelessWidget {
               children: const [
                 SizedBox(width: 15),
                 Icon(Icons.arrow_back_ios, color: Colors.blue, size: 18),
-                Text("Kembali", style: TextStyle(color: Colors.blue, fontSize: 14, fontWeight: FontWeight.w500))
+                Text(
+                  "Kembali",
+                  style: TextStyle(
+                    color: Colors.blue,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
               ],
             ),
           ),
@@ -39,10 +50,13 @@ class StepByStepView extends StatelessWidget {
           children: [
             const Align(
               alignment: Alignment.centerLeft,
-              child: Text("Langkah 1 dari 1", style: TextStyle(color: Colors.grey)),
+              child: Text(
+                "Langkah 1 dari 1",
+                style: TextStyle(color: Colors.grey),
+              ),
             ),
             const SizedBox(height: 20),
-            
+
             Container(
               height: 250,
               width: double.infinity,
@@ -56,53 +70,65 @@ class StepByStepView extends StatelessWidget {
                   Icon(Icons.gif, size: 50, color: Colors.grey),
                   Positioned(
                     bottom: 20,
-                    child: Text("(Animasi GIF)", style: TextStyle(color: Colors.black54)),
-                  )
+                    child: Text(
+                      "(Animasi GIF)",
+                      style: TextStyle(color: Colors.black54),
+                    ),
+                  ),
                 ],
               ),
             ),
-            
+
             const SizedBox(height: 30),
-            
+
             Text(
-              stepData['description'] ?? "Ikuti instruksi sesuai gambar di atas.",
+              stepData['description'] ??
+                  "Ikuti instruksi sesuai gambar di atas.",
               textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 16, height: 1.5, color: Colors.black87),
+              style: const TextStyle(
+                fontSize: 16,
+                height: 1.5,
+                color: Colors.black87,
+              ),
             ),
-            
+
             const Spacer(),
-            
+
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 ElevatedButton(
-                  onPressed: (){
+                  onPressed: () {
                     Get.snackbar("Info", "Ini langkah pertama");
-                  }, 
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.grey[200], 
-                    foregroundColor: Colors.black,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                    padding: const EdgeInsets.symmetric(horizontal: 20)
-                  ),
-                  child: const Text("< Prev"),
-                ),
-                ElevatedButton(
-                  onPressed: (){
-                     Get.back(); 
-                  }, 
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.grey[200],
                     foregroundColor: Colors.black,
                     elevation: 0,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                    padding: const EdgeInsets.symmetric(horizontal: 20)
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                  ),
+                  child: const Text("< Prev"),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    Get.back();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.grey[200],
+                    foregroundColor: Colors.black,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
                   ),
                   child: const Text("Next >"),
                 ),
               ],
-            )
+            ),
           ],
         ),
       ),
