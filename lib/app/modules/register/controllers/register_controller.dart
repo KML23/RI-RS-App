@@ -1,45 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart'; // Jangan lupa: flutter pub add intl
+import 'package:intl/intl.dart';
+import 'package:firebase_auth/firebase_auth.dart'; // Import Auth
+import 'package:cloud_firestore/cloud_firestore.dart'; // Import Firestore
 
 class RegisterController extends GetxController {
-  // --- STATE VARIABLES ---
-  var currentStep = 1.obs; // 1 untuk Tahap 1, 2 untuk Tahap 2
+  var currentStep = 1.obs;
   
-  // Tahap 1 Inputs
-  final rmC = TextEditingController(); // Rekam Medis
-  final dobC = TextEditingController(); // Tanggal Lahir
-
-  // Tahap 2 Inputs
+  final rmC = TextEditingController();
+  final dobC = TextEditingController();
   final passC = TextEditingController();
   final confirmPassC = TextEditingController();
   
-  // Visibility & Checkbox
   var isPassHidden = true.obs;
   var isConfirmHidden = true.obs;
   var isTermsAccepted = false.obs;
+  var isLoading = false.obs; // Tambahan loading state
 
-  // --- ACTIONS ---
-
-  // Fungsi pilih tanggal
   Future<void> selectDate(BuildContext context) async {
     DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
+      initialDate: DateTime(1990), // Default lebih lama biar enak
       firstDate: DateTime(1900),
       lastDate: DateTime.now(),
     );
     if (picked != null) {
-      // Format tanggal jadi DD / MM / YYYY
       dobC.text = DateFormat('dd / MM / yyyy').format(picked);
     }
   }
 
-  // Pindah dari Tahap 1 ke Tahap 2 (Verifikasi Data)
   void verifyData() {
     if (rmC.text.isNotEmpty && dobC.text.isNotEmpty) {
-      // Simulasi cek ke server...
-      // Jika valid:
       currentStep.value = 2; 
     } else {
       Get.snackbar("Error", "Harap lengkapi data diri Anda", 
@@ -47,35 +38,65 @@ class RegisterController extends GetxController {
     }
   }
 
-  // Tombol Kembali di Header
   void backButton() {
     if (currentStep.value == 2) {
-      currentStep.value = 1; // Mundur ke tahap 1
+      currentStep.value = 1;
     } else {
-      Get.back(); // Kembali ke halaman Login/sebelumnya
+      Get.back();
     }
   }
 
-  // Finalisasi Registrasi
-  void submitRegistration() {
+  // --- FUNGSI REGISTRASI ASLI ---
+  void submitRegistration() async {
     if (!isTermsAccepted.value) {
-      Get.snackbar("Info", "Anda harus menyetujui syarat & ketentuan",
-        backgroundColor: Colors.orange, colorText: Colors.white);
+      Get.snackbar("Info", "Anda harus menyetujui syarat & ketentuan", backgroundColor: Colors.orange, colorText: Colors.white);
       return;
     }
 
     if (passC.text != confirmPassC.text) {
-       Get.snackbar("Error", "Password konfirmasi tidak sama",
-        backgroundColor: Colors.red, colorText: Colors.white);
+       Get.snackbar("Error", "Password konfirmasi tidak sama", backgroundColor: Colors.red, colorText: Colors.white);
        return;
     }
 
-    // Logic simpan ke database...
-    Get.snackbar("Sukses", "Akun berhasil dibuat!",
-        backgroundColor: Colors.green, colorText: Colors.white);
-    
-    // Arahkan ke Dashboard/Login
-    Get.offAllNamed('/login');
+    try {
+      isLoading.value = true;
+
+      // 1. Trik: Ubah RM jadi Email format (karena Firebase wajib email)
+      String dummyEmail = "${rmC.text.trim()}@rs-app.com";
+
+      // 2. Buat Akun di Firebase Authentication
+      UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: dummyEmail,
+        password: passC.text,
+      );
+
+      // 3. Simpan Detail Profil ke Cloud Firestore
+      // Kita set nama default dulu, nanti bisa diedit
+      await FirebaseFirestore.instance.collection('users').doc(userCredential.user!.uid).set({
+        'rm': rmC.text.trim(),
+        'dob': dobC.text,
+        'name': "Pasien Baru", // Default name
+        'created_at': DateTime.now().toIso8601String(),
+      });
+
+      // 4. Sukses
+      Get.snackbar("Sukses", "Akun berhasil dibuat! Silakan Login.", backgroundColor: Colors.green, colorText: Colors.white);
+      
+      // Logout otomatis biar user login ulang (biar flow aman)
+      await FirebaseAuth.instance.signOut();
+      Get.offAllNamed('/login');
+
+    } on FirebaseAuthException catch (e) {
+      String message = "Terjadi kesalahan";
+      if (e.code == 'weak-password') message = "Password terlalu lemah (min 6 karakter)";
+      if (e.code == 'email-already-in-use') message = "Nomor RM ini sudah terdaftar";
+      
+      Get.snackbar("Gagal", message, backgroundColor: Colors.red, colorText: Colors.white);
+    } catch (e) {
+      Get.snackbar("Error", e.toString(), backgroundColor: Colors.red, colorText: Colors.white);
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   @override

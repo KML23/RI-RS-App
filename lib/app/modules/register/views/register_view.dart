@@ -1,4 +1,3 @@
-//sandy haji tahun depan
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:get/get.dart';
@@ -9,7 +8,6 @@ class RegisterView extends GetView<RegisterController> {
 
   @override
   Widget build(BuildContext context) {
-    // Warna & Style
     final Color primaryBlue = Color(0xFF007BFF);
 
     return Scaffold(
@@ -17,45 +15,33 @@ class RegisterView extends GetView<RegisterController> {
       appBar: AppBar(
         backgroundColor: const Color(0xFFF0F4F8),
         elevation: 0,
-        // Matikan leading bawaan agar tidak ada batasan lebar yang kaku
         automaticallyImplyLeading: false,
-        // Beri jarak sedikit dari pinggir layar
         titleSpacing: 20,
         title: Row(
           children: [
-            // --- 1. TOMBOL KEMBALI (ICON + TEKS) ---
-            // Kita gabung jadi satu GestureDetector agar area kliknya enak
             GestureDetector(
               onTap: () => controller.backButton(),
               child: Row(
-                mainAxisSize:
-                    MainAxisSize.min, // Agar ukurannya seperlunya saja
+                mainAxisSize: MainAxisSize.min, 
                 children: [
                   Icon(
                     Icons.arrow_back_ios,
-                    color: Color(0xFF007BFF), // primaryBlue
+                    color: Color(0xFF007BFF), 
                     size: 18,
                   ),
-                  // Tidak perlu SizedBox lebar-lebar, cukup nempel atau dikit aja
                   const SizedBox(width: 2),
                   Text(
                     "Kembali",
                     style: TextStyle(
-                      color: Color(0xFF007BFF), // primaryBlue
+                      color: Color(0xFF007BFF),
                       fontSize: 14,
-                      fontWeight:
-                          FontWeight.w500, // Sedikit tebal biar enak dibaca
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ],
               ),
             ),
-
-            // --- 2. JARAK ANTARA KEMBALI & JUDUL ---
             const SizedBox(width: 15),
-
-            // --- 3. JUDUL HALAMAN ---
-            // Bungkus dengan Flexible agar kalau layar kecil teks tidak overflow keluar layar kanan
             Flexible(
               child: Obx(
                 () => Text(
@@ -65,8 +51,7 @@ class RegisterView extends GetView<RegisterController> {
                     fontWeight: FontWeight.bold,
                     fontSize: 18,
                   ),
-                  overflow:
-                      TextOverflow.ellipsis, // Titik-titik jika kepanjangan
+                  overflow: TextOverflow.ellipsis,
                   maxLines: 1,
                 ),
               ),
@@ -79,7 +64,6 @@ class RegisterView extends GetView<RegisterController> {
           padding: const EdgeInsets.all(30),
           child: Column(
             children: [
-              // --- LOGO (Sama di kedua step) ---
               Icon(Icons.medication_liquid, size: 80, color: primaryBlue),
               const SizedBox(height: 10),
               const Text(
@@ -88,7 +72,6 @@ class RegisterView extends GetView<RegisterController> {
               ),
               const SizedBox(height: 40),
 
-              // --- CONTENT AREA (SWITCHABLE) ---
               Obx(() {
                 if (controller.currentStep.value == 1) {
                   return _buildStepOne(primaryBlue);
@@ -114,7 +97,6 @@ class RegisterView extends GetView<RegisterController> {
         ),
         const SizedBox(height: 30),
 
-        // Input RM
         const Text(
           "Nomor Rekam Medis :",
           style: TextStyle(fontWeight: FontWeight.bold),
@@ -127,7 +109,6 @@ class RegisterView extends GetView<RegisterController> {
 
         const SizedBox(height: 20),
 
-        // Input Tanggal Lahir
         const Text(
           "Tanggal Lahir",
           style: TextStyle(fontWeight: FontWeight.bold),
@@ -135,7 +116,7 @@ class RegisterView extends GetView<RegisterController> {
         const SizedBox(height: 8),
         TextField(
           controller: controller.dobC,
-          readOnly: true, // Tidak bisa diketik manual
+          readOnly: true, 
           onTap: () => controller.selectDate(Get.context!),
           decoration: _inputDecoration(
             "DD / MM / YYYY",
@@ -144,7 +125,6 @@ class RegisterView extends GetView<RegisterController> {
 
         const SizedBox(height: 40),
 
-        // Button Verifikasi
         Center(
           child: SizedBox(
             width: 200,
@@ -159,7 +139,6 @@ class RegisterView extends GetView<RegisterController> {
 
         const SizedBox(height: 40),
 
-        // Footer Masuk Disini
         Center(
           child: RichText(
             text: TextSpan(
@@ -184,9 +163,8 @@ class RegisterView extends GetView<RegisterController> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Pesan Berhasil
         RichText(
-          text: const TextSpan(
+          text: TextSpan(
             style: TextStyle(
               color: Colors.black,
               fontSize: 14,
@@ -194,14 +172,13 @@ class RegisterView extends GetView<RegisterController> {
             ),
             children: [
               TextSpan(text: "Verifikasi Berhasil!!\n"),
-              TextSpan(text: "Selamat Datang, \"Bapak Manto\".\n"),
-              TextSpan(text: "20221037031147"),
+              // Kita tampilkan RM yang baru diinput di step 1
+              TextSpan(text: "Nomor RM: ${controller.rmC.text}"), 
             ],
           ),
         ),
         const SizedBox(height: 30),
 
-        // Input Password Baru
         const Text(
           "Buat Password Aplikasi :",
           style: TextStyle(fontWeight: FontWeight.bold),
@@ -227,7 +204,6 @@ class RegisterView extends GetView<RegisterController> {
 
         const SizedBox(height: 20),
 
-        // Input Konfirmasi Password
         const Text(
           "Konfirmasi Password :",
           style: TextStyle(fontWeight: FontWeight.bold),
@@ -253,7 +229,6 @@ class RegisterView extends GetView<RegisterController> {
 
         const SizedBox(height: 20),
 
-        // Checkbox Syarat & Ketentuan
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -280,23 +255,24 @@ class RegisterView extends GetView<RegisterController> {
 
         const SizedBox(height: 40),
 
-        // Button Final Verifikasi
+        // --- BUTTON FINAL DENGAN LOADING ---
         Center(
-          child: SizedBox(
+          child: Obx(() => SizedBox(
             width: 200,
             height: 50,
             child: ElevatedButton(
-              onPressed: () => controller.submitRegistration(),
+              onPressed: controller.isLoading.value ? null : () => controller.submitRegistration(),
               style: _buttonStyle(),
-              child: const Text("VERIFIKASI"),
+              child: controller.isLoading.value 
+                ? SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.black))
+                : const Text("DAFTAR SEKARANG"),
             ),
-          ),
+          )),
         ),
       ],
     );
   }
 
-  // --- REUSABLE STYLES ---
   InputDecoration _inputDecoration(String hint) {
     return InputDecoration(
       hintText: hint,
