@@ -7,6 +7,7 @@ class HomeView extends GetView<HomeController> {
 
   @override
   Widget build(BuildContext context) {
+    // Palet Warna Konsisten
     final Color bgPage = const Color(0xFFF5F9FC);
     final Color primaryBlue = const Color(0xFF007BFF);
 
@@ -30,24 +31,28 @@ class HomeView extends GetView<HomeController> {
                         style: TextStyle(color: Colors.grey, fontSize: 14),
                       ),
                       const SizedBox(height: 4),
-                      Text(
-                        controller.userName,
+                      
+                      Obx(() => Text(
+                        controller.userName.value, 
                         style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                           color: Colors.black87,
                         ),
-                      ),
-                      Text(
-                        "RM: ${controller.userRM}",
+                      )),
+                      
+                      Obx(() => Text(
+                        "RM: ${controller.userRM.value}",
                         style: TextStyle(
                           color: primaryBlue,
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
                         ),
-                      ),
+                      )),
                     ],
                   ),
+                  
+                  // Avatar Profile
                   Container(
                     width: 50,
                     height: 50,
@@ -56,6 +61,7 @@ class HomeView extends GetView<HomeController> {
                       color: Colors.white,
                       border: Border.all(color: Colors.grey.shade200),
                       image: const DecorationImage(
+                        // Placeholder image
                         image: NetworkImage('https://i.pravatar.cc/150?img=12'),
                         fit: BoxFit.cover,
                       ),
@@ -109,7 +115,7 @@ class HomeView extends GetView<HomeController> {
                           ),
                           const SizedBox(height: 15),
                           ElevatedButton(
-                            onPressed: () {},
+                            onPressed: () {}, // Bisa ke halaman detail riwayat
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.white,
                               foregroundColor: primaryBlue,
@@ -128,6 +134,7 @@ class HomeView extends GetView<HomeController> {
                         ],
                       ),
                     ),
+                    // Ilustrasi/Icon Besar
                     Icon(
                       Icons.favorite_border,
                       size: 80,
@@ -154,10 +161,10 @@ class HomeView extends GetView<HomeController> {
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
+                  crossAxisCount: 3, // 3 kolom
                   crossAxisSpacing: 15,
                   mainAxisSpacing: 15,
-                  childAspectRatio: 0.85,
+                  childAspectRatio: 0.85, // Mengatur tinggi kotak
                 ),
                 itemCount: controller.menus.length,
                 itemBuilder: (context, index) {
@@ -179,6 +186,7 @@ class HomeView extends GetView<HomeController> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
+                          // Lingkaran Icon
                           Container(
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
@@ -189,6 +197,7 @@ class HomeView extends GetView<HomeController> {
                                 color: menu['color'], size: 28),
                           ),
                           const SizedBox(height: 12),
+                          // Text Judul
                           Text(
                             menu['title'],
                             textAlign: TextAlign.center,
@@ -207,7 +216,7 @@ class HomeView extends GetView<HomeController> {
 
               const SizedBox(height: 30),
 
-              // --- 4. AREA LAINNYA ---
+              // --- 4. AREA LAINNYA (LOGOUT / AKUN) ---
               ListTile(
                 onTap: () => controller.logout(),
                 contentPadding: EdgeInsets.zero,
@@ -234,6 +243,8 @@ class HomeView extends GetView<HomeController> {
           ),
         ),
       ),
+
+      // Bottom Nav (Opsional jika ingin tetap ada di Home)
       bottomNavigationBar: Container(
         height: 70,
         decoration: const BoxDecoration(
@@ -247,7 +258,7 @@ class HomeView extends GetView<HomeController> {
               Icons.home_filled,
               size: 30,
               color: Color(0xFF007BFF),
-            ),
+            ), // Aktif
             Icon(Icons.medication, size: 30, color: Colors.black38),
             Icon(Icons.notifications, size: 30, color: Colors.black38),
             Icon(Icons.person, size: 30, color: Colors.black38),
