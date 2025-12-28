@@ -2,19 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class MedicationController extends GetxController {
-  // STATUS TAMPILAN
-  // 0 = Reminder (Hitam)
-  // 1 = List Jadwal (Putih)
-  // 2 = Detail Obat
-  // 3 = Tambah Pengingat (BARU)
   var viewState = 0.obs;
 
-  // --- FORM INPUT VARIABLES (BARU) ---
+  
   final nameC = TextEditingController();
   final doseC = TextEditingController();
-  var selectedTime = TimeOfDay.now().obs; // Default waktu sekarang
+  var selectedTime = TimeOfDay.now().obs; 
 
-  // DATA DUMMY
+  
   final List<Map<String, dynamic>> medicationList = [
     {
       "name": "PARACETAMOL 500mg",
@@ -44,11 +39,11 @@ class MedicationController extends GetxController {
     },
   ];
 
-  // --- ACTIONS ---
+  
 
-  // 1. Masuk ke Halaman Tambah (State 3)
+  
   void goToAddReminder() {
-    // Reset form agar kosong saat dibuka
+    
     nameC.clear();
     doseC.clear();
     selectedTime.value = TimeOfDay.now();
@@ -56,7 +51,7 @@ class MedicationController extends GetxController {
     viewState.value = 3; 
   }
 
-  // 2. Fungsi Pilih Jam (TimePicker)
+  
   Future<void> pickTime(BuildContext context) async {
     final TimeOfDay? picked = await showTimePicker(
       context: context,
@@ -65,7 +60,7 @@ class MedicationController extends GetxController {
         return Theme(
           data: ThemeData.light().copyWith(
             colorScheme: const ColorScheme.light(
-              primary: Colors.black, // Header hitam
+              primary: Colors.black, 
               onPrimary: Colors.white,
               onSurface: Colors.black,
             ),
@@ -79,10 +74,10 @@ class MedicationController extends GetxController {
     }
   }
 
-  // 3. Simpan Pengingat Baru
+  
   void saveManualReminder() {
     if (nameC.text.isNotEmpty && doseC.text.isNotEmpty) {
-      // Tampilkan notifikasi sukses
+      
       Get.snackbar(
         "Berhasil",
         "Pengingat ${nameC.text} berhasil ditambahkan",
@@ -92,7 +87,7 @@ class MedicationController extends GetxController {
         margin: const EdgeInsets.all(20),
       );
       
-      // Kembali ke tampilan List Jadwal
+      
       viewState.value = 1; 
     } else {
       Get.snackbar(
@@ -106,7 +101,7 @@ class MedicationController extends GetxController {
     }
   }
 
-  // --- NAVIGASI STANDAR ---
+  
 
   void markAsTaken() {
     viewState.value = 1;
@@ -126,8 +121,7 @@ class MedicationController extends GetxController {
   }
 
   void backToList() {
-    // Fungsi tombol 'Kembali'
-    // Jika dari Detail (2) atau Tambah (3), kembali ke List (1)
+
     viewState.value = 1;
   }
 

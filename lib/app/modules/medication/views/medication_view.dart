@@ -19,17 +19,17 @@ class MedicationView extends GetView<MedicationController> {
         centerTitle: true,
         leadingWidth: 100,
         leading: Obx(() {
-          // Jika di State 0 (Reminder Hitam), tidak ada tombol kembali
+          
           if (controller.viewState.value == 0) return const SizedBox();
 
-          // Tombol Kembali
+          
           return GestureDetector(
             onTap: () {
-              // Jika sedang di Detail (2) atau Tambah (3), kembali ke List (1)
+              
               if (controller.viewState.value == 2 || controller.viewState.value == 3) {
                 controller.backToList();
               } else {
-                // Jika di List (1), kembali ke Reminder (0) - Opsional
+                
                 controller.backToReminder();
               }
             },
@@ -46,10 +46,10 @@ class MedicationView extends GetView<MedicationController> {
           );
         }),
         title: Obx(() {
-          // Judul AppBar berubah sesuai State
+          
           String title = 'Jadwal Obat Saya';
           if (controller.viewState.value == 2) title = 'Detail Paracetamol';
-          if (controller.viewState.value == 3) title = 'Tambah Pengingat'; // Judul Baru
+          if (controller.viewState.value == 3) title = 'Tambah Pengingat'; 
           
           return Text(
             title,
@@ -80,13 +80,13 @@ class MedicationView extends GetView<MedicationController> {
           case 2:
             return _buildDetailView();
           case 3:
-            return _buildAddReminderView(); // Tampilan Form Baru
+            return _buildAddReminderView(); 
           default:
             return _buildScheduleListView();
         }
       }),
 
-      // --- BOTTOM NAVIGATION BAR ---
+      
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: 1,
         onTap: (val) {},
