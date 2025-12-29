@@ -82,17 +82,22 @@ class SymtomCheckerView extends GetView<SymtomCheckerController> {
           return Obx(() {
             bool isSelected = controller.selectedCategoryIndex.value == index;
             var cat = controller.categoriesData[index];
+            
+            // PERBAIKAN DI SINI:
+            // Ambil color langsung, jangan dibungkus Color() lagi
+            Color catColor = cat['color']; 
+
             return GestureDetector(
               onTap: () => controller.changeCategory(index),
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 300),
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 decoration: BoxDecoration(
-                  color: isSelected ? Color(cat['color']) : Colors.white,
+                  color: isSelected ? catColor : Colors.white, // FIX
                   borderRadius: BorderRadius.circular(25),
                   border: isSelected ? null : Border.all(color: Colors.grey.shade300),
                   boxShadow: isSelected 
-                      ? [BoxShadow(color: Color(cat['color']).withOpacity(0.4), blurRadius: 8, offset: const Offset(0, 4))] 
+                      ? [BoxShadow(color: catColor.withOpacity(0.4), blurRadius: 8, offset: const Offset(0, 4))] // FIX
                       : [],
                 ),
                 child: Row(
@@ -119,7 +124,10 @@ class SymtomCheckerView extends GetView<SymtomCheckerController> {
   Widget _buildSymptomGrid() {
     var currentCat = controller.categoriesData[controller.selectedCategoryIndex.value];
     List symptoms = currentCat['symptoms'];
-    Color themeColor = Color(currentCat['color']);
+    
+    // PERBAIKAN DI SINI:
+    // Hapus Color(), langsung ambil nilainya
+    Color themeColor = currentCat['color']; 
 
     return GridView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -127,7 +135,7 @@ class SymtomCheckerView extends GetView<SymtomCheckerController> {
         crossAxisCount: 2,
         crossAxisSpacing: 15,
         mainAxisSpacing: 15,
-        childAspectRatio: 0.85, // Kartu sedikit tinggi
+        childAspectRatio: 0.85, 
       ),
       itemCount: symptoms.length,
       itemBuilder: (context, index) {
@@ -143,7 +151,6 @@ class SymtomCheckerView extends GetView<SymtomCheckerController> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Icon Besar (Visual)
                 Container(
                   padding: const EdgeInsets.all(18),
                   decoration: BoxDecoration(
@@ -177,6 +184,12 @@ class SymtomCheckerView extends GetView<SymtomCheckerController> {
       itemCount: controller.searchResults.length,
       itemBuilder: (context, index) {
         final data = controller.searchResults[index];
+        
+        // Handling color safety kalau-kalau null
+        Color itemColor = data['color'] is Color 
+            ? data['color'] 
+            : Color(data['color'] ?? 0xFF000000);
+
         return Card(
           margin: const EdgeInsets.only(bottom: 10),
           elevation: 0,
@@ -184,8 +197,8 @@ class SymtomCheckerView extends GetView<SymtomCheckerController> {
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
           child: ListTile(
             leading: CircleAvatar(
-              backgroundColor: Color(data['color'] ?? 0xFF000000).withOpacity(0.1),
-              child: Icon(data['icon'], color: Color(data['color'] ?? 0xFF000000)),
+              backgroundColor: itemColor.withOpacity(0.1),
+              child: Icon(data['icon'], color: itemColor),
             ),
             title: Text(data['name'], style: const TextStyle(fontWeight: FontWeight.bold)),
             subtitle: Text(data['category_name'] ?? ""),
@@ -204,8 +217,10 @@ class SymtomCheckerView extends GetView<SymtomCheckerController> {
   }
 }
 
+// --- CLASS LAIN DI BAWAHNYA TETAP SAMA (DETAIL VIEW & ACTION VIEW) ---
+// (Copy paste kode bawahnya dari file lama kamu kalau ada custom, 
+// tapi bagian SymtomCheckerView di atas ini yang penting diperbaiki)
 
-// --- HALAMAN DETAIL: PERBANDINGAN VISUAL (HMW 4) ---
 class SymptomDetailView extends StatelessWidget {
   final Map<String, dynamic> data;
   const SymptomDetailView({super.key, required this.data});
@@ -235,7 +250,6 @@ class SymptomDetailView extends StatelessWidget {
             ),
             const SizedBox(height: 25),
 
-            // OPSI 1: NORMAL (Hijau)
             _buildComparisonCard(
               context,
               title: "Normal / Ringan",
@@ -246,7 +260,6 @@ class SymptomDetailView extends StatelessWidget {
 
             const SizedBox(height: 20),
 
-            // OPSI 2: BAHAYA (Merah)
             _buildComparisonCard(
               context,
               title: "Perlu Diwaspadai",
@@ -278,7 +291,6 @@ class SymptomDetailView extends StatelessWidget {
         ),
         child: Column(
           children: [
-            // Header Warna
             Container(
               padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
               decoration: BoxDecoration(
@@ -295,7 +307,6 @@ class SymptomDetailView extends StatelessWidget {
                 ],
               ),
             ),
-            // Body (Placeholder Gambar)
             Padding(
               padding: const EdgeInsets.all(20),
               child: Row(
@@ -322,8 +333,6 @@ class SymptomDetailView extends StatelessWidget {
   }
 }
 
-
-// --- HALAMAN ACTION & UPLOAD (Tetap) ---
 class SymptomActionView extends GetView<SymtomCheckerController> {
   final Map<String, dynamic> data;
   final bool isDanger;
@@ -358,7 +367,6 @@ class SymptomActionView extends GetView<SymtomCheckerController> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // UPLOAD AREA (Fitur Kamera HMW 4)
             GestureDetector(
               onTap: () => controller.pickImage(),
               child: Container(
@@ -401,7 +409,6 @@ class SymptomActionView extends GetView<SymtomCheckerController> {
             
             const SizedBox(height: 40),
             
-            // Tombol Darurat jika Bahaya
             if (isDanger)
               SizedBox(
                 width: double.infinity,
@@ -409,7 +416,7 @@ class SymptomActionView extends GetView<SymtomCheckerController> {
                 child: ElevatedButton.icon(
                   onPressed: () {
                     Get.toNamed(Routes.CHAT);
-                  }, // Link ke Chat Perawat
+                  }, 
                   icon: const Icon(Icons.support_agent),
                   label: const Text("Hubungi Perawat Sekarang"),
                   style: ElevatedButton.styleFrom(

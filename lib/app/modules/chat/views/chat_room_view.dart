@@ -1,105 +1,163 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/chat_controller.dart';
-import '../../../data/models/message_model.dart';
 
 class ChatRoomView extends GetView<ChatController> {
   const ChatRoomView({super.key});
 
   @override
   Widget build(BuildContext context) {
+    // Ambil Data dari Halaman Sebelumnya (Arguments)
+    final Map<String, dynamic> args = Get.arguments ?? {
+      'name': 'Dr. Dokter', 
+      'status': 'Online'
+    };
+    
+    final String doctorName = args['name'];
+    final String status = args['status'];
+    final bool isOnline = status == 'Online';
+
+    final Color bgPage = const Color(0xFFFAFBFF);
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA),
+      backgroundColor: bgPage,
+
+      // --- 1. HEADER CHAT ---
       appBar: AppBar(
         backgroundColor: Colors.white,
-        elevation: 1,
+        elevation: 1, // Sedikit shadow biar terpisah dari chat area
+        shadowColor: Colors.grey.shade100,
+        leadingWidth: 50,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.blue),
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.black87),
           onPressed: () => Get.back(),
         ),
-        title: Obx(
-          () => Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                controller.isNurseJoined.value
-                    ? "Tim Perawat"
-                    : "Asisten AI Medis",
-                style: const TextStyle(
-                  color: Colors.black,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
+        title: Row(
+          children: [
+            // Avatar Kecil di Header
+            Stack(
+              children: [
+                CircleAvatar(
+                  radius: 20,
+                  backgroundColor: Colors.grey[200],
+                  child: const Icon(Icons.person, color: Colors.grey),
+                  // foregroundImage: NetworkImage('url_foto_jika_ada'),
                 ),
-              ),
-              if (controller.isNurseJoined.value)
-                const Text(
-                  "• Online (Sinta)",
-                  style: TextStyle(color: Colors.green, fontSize: 12),
-                ),
-            ],
-          ),
-        ),
-      ),
-      body: Column(
-        children: [
-          // --- LIST CHAT AREA ---
-          Expanded(
-            child: Obx(() {
-              return ListView.builder(
-                controller: controller.scrollController,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 20,
-                ),
-                itemCount: controller.messages.length,
-                itemBuilder: (context, index) {
-                  final msg = controller.messages[index];
-                  final isLast = index == controller.messages.length - 1;
-
-                  return Column(
-                    children: [
-                      _buildChatBubble(msg),
-
-                      // Logika menampilkan Feedback Option
-                      // Muncul hanya jika: Pesan terakhir, Dari AI, dan Perawat BELUM join
-                      if (isLast &&
-                          msg.sender == ChatSender.ai &&
-                          !controller.isNurseJoined.value)
-                        _buildFeedbackAI(),
-                    ],
-                  );
-                },
-              );
-            }),
-          ),
-
-          // --- TYPING INDICATOR ---
-          Obx(
-            () => controller.isTyping.value
-                ? Container(
-                    padding: const EdgeInsets.only(left: 20, bottom: 10),
-                    alignment: Alignment.centerLeft,
-                    child: const Text(
-                      "Sedang mengetik...",
-                      style: TextStyle(color: Colors.grey, fontSize: 12),
+                if (isOnline)
+                  Positioned(
+                    right: 0, 
+                    bottom: 0,
+                    child: Container(
+                      width: 12, height: 12,
+                      decoration: BoxDecoration(
+                        color: Colors.green,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white, width: 2),
+                      ),
                     ),
                   )
-                : const SizedBox.shrink(),
+              ],
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    doctorName,
+                    style: const TextStyle(color: Colors.black87, fontSize: 16, fontWeight: FontWeight.bold),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  Text(
+                    status,
+                    style: TextStyle(
+                      color: isOnline ? Colors.green : Colors.grey, 
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.call_rounded, color: Colors.blue),
+            onPressed: () {
+              // Fitur Telepon (Opsional)
+              Get.snackbar("Info", "Fitur panggilan suara akan segera hadir.");
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.videocam_rounded, color: Colors.blue),
+            onPressed: () {
+              // Fitur Video Call (Opsional)
+            },
+          ),
+        ],
+      ),
+
+      body: Column(
+        children: [
+          // --- 2. AREA CHAT (MESSAGES) ---
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+              children: [
+                // Tanggal Pemisah
+                _buildDateSeparator("Hari Ini"),
+                
+                // Pesan Dokter (Kiri)
+                _buildMessageBubble(
+                  message: "Selamat pagi, Pak. Bagaimana perkembangan nyeri sendinya hari ini?",
+                  time: "08:30",
+                  isSender: false,
+                ),
+
+                // Pesan User (Kanan)
+                _buildMessageBubble(
+                  message: "Selamat pagi Dok. Alhamdulillah sudah agak mendingan setelah minum obat.",
+                  time: "08:32",
+                  isSender: true,
+                ),
+
+                // Pesan Dokter (Kiri)
+                _buildMessageBubble(
+                  message: "Syukurlah. Jangan lupa tetap kompres hangat ya kalau masih terasa kaku.",
+                  time: "08:33",
+                  isSender: false,
+                ),
+                
+                 // Pesan User (Kanan - Panjang)
+                _buildMessageBubble(
+                  message: "Baik Dok, akan saya lakukan. Nanti sore saya kirim foto hasil tensi darah ya.",
+                  time: "08:35",
+                  isSender: true,
+                ),
+              ],
+            ),
           ),
 
-          // --- INPUT AREA ---
+          // --- 3. INPUT AREA (BAGIAN BAWAH) ---
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            color: Colors.white,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, -5))
+              ],
+            ),
             child: SafeArea(
               child: Row(
                 children: [
-                  const Icon(
-                    Icons.add_circle_outline,
-                    color: Colors.grey,
-                    size: 28,
+                  // Tombol Tambah (Attachment)
+                  IconButton(
+                    onPressed: () {},
+                    icon: const Icon(Icons.add_circle_outline_rounded, color: Colors.grey, size: 28),
                   ),
-                  const SizedBox(width: 10),
+                  
+                  // Kolom Ketik
                   Expanded(
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -108,25 +166,29 @@ class ChatRoomView extends GetView<ChatController> {
                         borderRadius: BorderRadius.circular(25),
                       ),
                       child: TextField(
-                        controller: controller.textEditingController,
-                        decoration: const InputDecoration(
-                          hintText: "Ketik Pesan Anda...",
+                        decoration: InputDecoration(
+                          hintText: "Tulis pesan...",
+                          hintStyle: TextStyle(color: Colors.grey[500]),
                           border: InputBorder.none,
-                          isDense: true,
-                          contentPadding: EdgeInsets.symmetric(vertical: 10),
+                          contentPadding: const EdgeInsets.symmetric(vertical: 12),
                         ),
-                        onSubmitted: (val) => controller.sendMessage(val),
                       ),
                     ),
                   ),
+                  
                   const SizedBox(width: 10),
-                  InkWell(
-                    onTap: () => controller.sendMessage(
-                      controller.textEditingController.text,
+                  
+                  // Tombol Kirim (Besar & Biru)
+                  Container(
+                    decoration: const BoxDecoration(
+                      color: Color(0xFF2F80ED),
+                      shape: BoxShape.circle,
                     ),
-                    child: const CircleAvatar(
-                      backgroundColor: Colors.white,
-                      child: Icon(Icons.send, color: Colors.blue),
+                    child: IconButton(
+                      onPressed: () {
+                         // Aksi kirim pesan
+                      },
+                      icon: const Icon(Icons.send_rounded, color: Colors.white, size: 22),
                     ),
                   ),
                 ],
@@ -138,183 +200,78 @@ class ChatRoomView extends GetView<ChatController> {
     );
   }
 
-  // --- WIDGET BUBBLE CHAT ---
-  Widget _buildChatBubble(ChatMessage msg) {
-    if (msg.sender == ChatSender.system) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 20),
-        child: Column(
-          children: [
-            Text(
-              msg.text,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.grey[600],
-                fontSize: 12,
-                fontStyle: FontStyle.italic,
-              ),
-            ),
-            const Divider(height: 20, thickness: 0.5),
-          ],
-        ),
-      );
-    }
+  // --- WIDGET HELPERS ---
 
-    bool isMe = msg.sender == ChatSender.user;
-    bool isNurse = msg.sender == ChatSender.nurse;
-
-    return Align(
-      alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+  Widget _buildDateSeparator(String date) {
+    return Center(
       child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.all(16),
-        constraints: BoxConstraints(maxWidth: Get.width * 0.75),
+        margin: const EdgeInsets.symmetric(vertical: 20),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
-          color: isMe ? Colors.blue[600] : Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: const Radius.circular(16),
-            topRight: const Radius.circular(16),
-            bottomLeft: isMe ? const Radius.circular(16) : Radius.zero,
-            bottomRight: isMe ? Radius.zero : const Radius.circular(16),
-          ),
-          boxShadow: [
-            if (!isMe)
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.1),
-                blurRadius: 3,
-                offset: const Offset(0, 1),
-              ),
-          ],
+          color: Colors.grey[200],
+          borderRadius: BorderRadius.circular(12),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (isNurse)
-              const Padding(
-                padding: EdgeInsets.only(bottom: 4),
-                child: Text(
-                  "Sinta (Tim Perawat)",
-                  style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.blue,
-                  ),
-                ),
-              ),
-
-            Text(
-              msg.text,
-              style: TextStyle(
-                color: isMe ? Colors.white : Colors.black87,
-                fontSize: 14,
-                height: 1.4,
-              ),
-            ),
-            const SizedBox(height: 6),
-            Align(
-              alignment: Alignment.bottomRight,
-              child: Text(
-                controller.formatTime(msg.time),
-                style: TextStyle(
-                  color: isMe ? Colors.white70 : Colors.grey[400],
-                  fontSize: 10,
-                ),
-              ),
-            ),
-          ],
+        child: Text(
+          date,
+          style: const TextStyle(color: Colors.black54, fontSize: 12, fontWeight: FontWeight.bold),
         ),
       ),
     );
   }
 
-  // --- WIDGET FEEDBACK (UPDATED WITH LOADING STATE) ---
-  Widget _buildFeedbackAI() {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 15, left: 10, right: 10),
-      padding: const EdgeInsets.all(15),
-      decoration: BoxDecoration(
-        color: Colors.blue.shade50.withOpacity(0.5),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.blue.shade100),
-      ),
-      child: Column(
-        children: [
-          const Text(
-            "Apakah jawaban ini membantu?",
-            style: TextStyle(fontSize: 12, color: Colors.grey),
+  Widget _buildMessageBubble({
+    required String message, 
+    required String time, 
+    required bool isSender
+  }) {
+    return Align(
+      alignment: isSender ? Alignment.centerRight : Alignment.centerLeft,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        constraints: const BoxConstraints(maxWidth: 280), // Maksimal lebar balon 70% layar
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: isSender ? const Color(0xFF2F80ED) : Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: const Radius.circular(20),
+            topRight: const Radius.circular(20),
+            bottomLeft: isSender ? const Radius.circular(20) : const Radius.circular(0), // Ekor balon dokter
+            bottomRight: isSender ? const Radius.circular(0) : const Radius.circular(20), // Ekor balon user
           ),
-          const SizedBox(height: 10),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Tombol Ya
-              ElevatedButton(
-                onPressed: () =>
-                    Get.snackbar("Info", "Terima kasih feedbacknya"),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  foregroundColor: Colors.black,
-                  elevation: 0,
-                  side: BorderSide(color: Colors.grey.shade300),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(color: Colors.grey.withOpacity(0.05), blurRadius: 5, offset: const Offset(0, 2))
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: isSender ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+          children: [
+            Text(
+              message,
+              style: TextStyle(
+                color: isSender ? Colors.white : Colors.black87,
+                fontSize: 15,
+                height: 1.4, // Spasi baris biar enak dibaca
+              ),
+            ),
+            const SizedBox(height: 5),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  time,
+                  style: TextStyle(
+                    color: isSender ? Colors.white.withOpacity(0.7) : Colors.grey[400],
+                    fontSize: 11,
                   ),
                 ),
-                child: const Text("Ya"),
-              ),
-              const SizedBox(width: 10),
-
-              // --- UPDATE START: Tombol dengan Loading State ---
-              Obx(() {
-                bool isLoading = controller.isConnectingToNurse.value;
-                return ElevatedButton(
-                  // Jika isLoading, onPressed = null (otomatis disabled)
-                  onPressed: isLoading
-                      ? null
-                      : () => controller.connectToNurse(),
-
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    foregroundColor: Colors.white,
-                    disabledBackgroundColor:
-                        Colors.grey[300], // Warna saat disabled
-                    disabledForegroundColor: Colors.grey[600],
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    minimumSize: const Size(
-                      180,
-                      40,
-                    ), // Ukuran fixed agar tidak goyang
-                  ),
-                  child: Row(
-                    children: [
-                      if (isLoading)
-                        const Padding(
-                          padding: EdgeInsets.only(right: 8.0),
-                          child: SizedBox(
-                            width: 12,
-                            height: 12,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Colors.grey,
-                            ),
-                          ),
-                        ),
-                      Text(
-                        isLoading
-                            ? "Menghubungkan..."
-                            : "Bicara dengan Perawat",
-                      ),
-                    ],
-                  ),
-                );
-              }),
-              // --- UPDATE END ---
-            ],
-          ),
-        ],
+                if (isSender) ...[
+                  const SizedBox(width: 5),
+                  const Icon(Icons.done_all_rounded, color: Colors.white70, size: 14),
+                ]
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

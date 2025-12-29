@@ -4,6 +4,7 @@ import '../modules/appointment/bindings/appointment_binding.dart';
 import '../modules/appointment/views/appointment_view.dart';
 import '../modules/chat/bindings/chat_binding.dart';
 import '../modules/chat/views/chat_home_view.dart';
+import '../modules/chat/views/chat_room_view.dart';
 import '../modules/dokumen/bindings/dokumen_binding.dart';
 import '../modules/dokumen/views/dokumen_view.dart';
 import '../modules/education/bindings/education_binding.dart';
@@ -16,6 +17,8 @@ import '../modules/login/bindings/login_binding.dart';
 import '../modules/login/views/login_view.dart';
 import '../modules/medication/bindings/medication_binding.dart';
 import '../modules/medication/views/medication_view.dart';
+import '../modules/profile/bindings/profile_binding.dart';
+import '../modules/profile/views/profile_view.dart';
 import '../modules/register/bindings/register_binding.dart';
 import '../modules/register/views/register_view.dart';
 import '../modules/symtom_checker/bindings/symtom_checker_binding.dart';
@@ -26,8 +29,7 @@ part 'app_routes.dart';
 class AppPages {
   AppPages._();
 
-
-  static const INITIAL = Routes.LOGIN;
+  static const INITIAL = Routes.HOME;
 
   static final routes = [
     GetPage(
@@ -79,6 +81,16 @@ class AppPages {
       name: _Paths.DOKUMEN,
       page: () => const DokumenView(),
       binding: DokumenBinding(),
+    ),
+    GetPage(
+      name: _Paths.CHAT_ROOM,
+      page: () => const ChatRoomView(),
+      binding: ChatBinding(),
+    ),
+    GetPage(
+      name: _Paths.PROFILE,
+      page: () => const ProfileView(),
+      binding: ProfileBinding(),
     ),
   ];
 }

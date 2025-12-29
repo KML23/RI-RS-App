@@ -1,73 +1,64 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/medication_controller.dart';
+import '../../../routes/app_pages.dart';
 
 class MedicationView extends GetView<MedicationController> {
   const MedicationView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final Color bgPage = const Color(0xFFEEF2F5);
+    // Background sama dengan Home agar seamless
+    final Color bgPage = const Color(0xFFFAFBFF);
 
     return Scaffold(
       backgroundColor: bgPage,
 
-      // --- APP BAR DINAMIS ---
+      // --- APP BAR (Clean & Unified) ---
       appBar: AppBar(
         backgroundColor: bgPage,
         elevation: 0,
         centerTitle: true,
-        leadingWidth: 100,
+        leadingWidth: 80,
         leading: Obx(() {
-          
-          if (controller.viewState.value == 0) return const SizedBox();
-
-          
-          return GestureDetector(
-            onTap: () {
-              
-              if (controller.viewState.value == 2 || controller.viewState.value == 3) {
-                controller.backToList();
-              } else {
-                
-                controller.backToReminder();
-              }
-            },
-            child: Row(
-              children: const [
-                SizedBox(width: 10),
-                Icon(Icons.arrow_back_ios, size: 16, color: Colors.blue),
-                Text(
-                  "Kembali",
-                  style: TextStyle(color: Colors.blue, fontSize: 14),
-                ),
-              ],
-            ),
-          );
+          // Jika di halaman utama list, tombol back kembali ke Home
+          if (controller.viewState.value == 1) {
+             return IconButton(
+              icon: const Icon(Icons.arrow_back_ios, color: Colors.black87),
+              onPressed: () => Get.offAllNamed(Routes.HOME),
+            );
+          }
+          // Jika di sub-halaman (detail/add), tombol back kembali ke List
+          if (controller.viewState.value == 2 || controller.viewState.value == 3) {
+             return IconButton(
+              icon: const Icon(Icons.arrow_back_ios, color: Colors.blue),
+              onPressed: () => controller.backToList(),
+            );
+          }
+           // Jika di Reminder View, tombol back ke List
+          if (controller.viewState.value == 0) {
+             return IconButton(
+              icon: const Icon(Icons.arrow_back_ios, color: Colors.blue),
+              onPressed: () => controller.backToList(),
+            );
+          }
+          return const SizedBox();
         }),
         title: Obx(() {
-          
-          String title = 'Jadwal Obat Saya';
-          if (controller.viewState.value == 2) title = 'Detail Paracetamol';
-          if (controller.viewState.value == 3) title = 'Tambah Pengingat'; 
+          String title = 'Jadwal Obat';
+          if (controller.viewState.value == 0) title = 'Pengingat';
+          if (controller.viewState.value == 2) title = 'Detail Obat';
+          if (controller.viewState.value == 3) title = 'Tambah Baru'; 
           
           return Text(
             title,
             style: const TextStyle(
               color: Colors.black87,
-              fontWeight: FontWeight.bold,
-              fontSize: 20,
+              fontWeight: FontWeight.w800, // Font tebal konsisten
+              fontSize: 18,
             ),
           );
         }),
-        actions: [
-          Obx(() => controller.viewState.value == 0
-              ? IconButton(
-                  icon: const Icon(Icons.headset_mic_outlined, color: Colors.black87),
-                  onPressed: () {},
-                )
-              : const SizedBox()),
-        ],
       ),
 
       // --- BODY SWITCHER ---
@@ -86,93 +77,148 @@ class MedicationView extends GetView<MedicationController> {
         }
       }),
 
-      
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 1,
-        onTap: (val) {},
-        type: BottomNavigationBarType.fixed,
-        showSelectedLabels: false,
-        showUnselectedLabels: false,
-        selectedItemColor: Colors.black,
-        unselectedItemColor: Colors.grey,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home_filled, size: 30),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: CircleAvatar(
-              backgroundColor: Colors.black,
-              radius: 22,
-              child: Icon(Icons.medication, color: Colors.white, size: 24),
+      // --- BOTTOM NAVIGATION (MIMIC HOME STYLE) ---
+      // Agar user merasa tidak "tersesat", kita samakan style-nya
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+             BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 20, offset: const Offset(0, -5))
+          ],
+        ),
+        child: BottomNavigationBar(
+          backgroundColor: Colors.white,
+          elevation: 0,
+          type: BottomNavigationBarType.fixed,
+          currentIndex: 1, // Aktif di menu Obat
+          selectedItemColor: const Color(0xFF6B8EFF),
+          unselectedItemColor: Colors.grey[400],
+          selectedFontSize: 12,
+          unselectedFontSize: 12,
+          showUnselectedLabels: true,
+          onTap: (index) {
+            if (index == 0) Get.offAllNamed(Routes.HOME);
+            // Index 1 is current
+            if (index == 2) Get.offAllNamed(Routes.APPOINTMENT);
+            if (index == 3) {} // Profil
+          },
+          items: const [
+            BottomNavigationBarItem(
+              icon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.home_rounded, size: 28)),
+              label: 'Beranda',
             ),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.notifications, size: 30),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person, size: 30),
-            label: '',
-          ),
-        ],
+            BottomNavigationBarItem(
+              icon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.medication_rounded, size: 28)),
+              label: 'Obat',
+            ),
+            BottomNavigationBarItem(
+              icon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.calendar_month_rounded, size: 28)),
+              label: 'Jadwal',
+            ),
+            BottomNavigationBarItem(
+              icon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.person_rounded, size: 28)),
+              label: 'Profil', 
+            ),
+          ],
+        ),
       ),
     );
   }
 
   // ==========================================
-  // STATE 0: TAMPILAN PENGINGAT (HITAM)
+  // STATE 0: TAMPILAN PENGINGAT (RENOVASI TOTAL)
   // ==========================================
   Widget _buildReminderView() {
-    final Color cardColor = const Color(0xFF4A4A4A);
     return Center(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
+        padding: const EdgeInsets.symmetric(horizontal: 24),
         child: Container(
-          constraints: const BoxConstraints(maxWidth: 400),
+          width: double.infinity,
           decoration: BoxDecoration(
-            color: cardColor,
-            borderRadius: BorderRadius.circular(20),
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(30),
+            // Shadow tebal tapi soft (Efek Floating Card)
+            boxShadow: [
+              BoxShadow(color: Colors.red.withOpacity(0.15), blurRadius: 30, offset: const Offset(0, 10)),
+            ],
           ),
-          padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
+          padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 25),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text("! Asisten Rawat Mandiri", style: TextStyle(color: Colors.white)),
-              const SizedBox(height: 30),
+              // Icon Animasi (Visual Bell)
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.red.shade50,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.notifications_active_rounded, color: Colors.redAccent, size: 50),
+              ),
+              const SizedBox(height: 25),
+              
               const Text(
                 "Waktunya Minum Obat!",
-                style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.black87, fontSize: 22, fontWeight: FontWeight.bold),
               ),
+              const SizedBox(height: 10),
+              Text(
+                "Jangan lupa minum obat agar\nkondisi tetap stabil.",
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.grey[500], fontSize: 14),
+              ),
+              
+              const SizedBox(height: 35),
+              
+              // Nama Obat Besar
+              Container(
+                padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFAFBFF),
+                  borderRadius: BorderRadius.circular(15),
+                  border: Border.all(color: Colors.blue.withOpacity(0.1)),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.medication_liquid_rounded, color: Colors.blue, size: 30),
+                    const SizedBox(width: 15),
+                    const Text(
+                      "Paracetamol 500mg",
+                      style: TextStyle(color: Colors.black87, fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+              ),
+
               const SizedBox(height: 40),
+              
+              // Action Buttons (Besar & Jelas)
               Row(
-                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Transform.rotate(
-                    angle: -0.5,
-                    child: const Icon(Icons.medication_outlined, color: Colors.black, size: 40),
+                   Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => controller.snoozeReminder(),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 15),
+                        side: BorderSide(color: Colors.grey.shade300),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                      ),
+                      child: const Text("Tunda 10 Menit", style: TextStyle(color: Colors.grey)),
+                    ),
                   ),
                   const SizedBox(width: 15),
-                  const Text("Paracetamol 500mg", style: TextStyle(color: Colors.white, fontSize: 16)),
-                ],
-              ),
-              const SizedBox(height: 50),
-              Row(
-                children: [
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () => controller.markAsTaken(),
-                      style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF28A745)),
-                      child: const Text("SUDAH"),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () => controller.snoozeReminder(),
-                      style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFB00020)),
-                      child: const Text("TUNDA 10 MENIT"),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF4ECDC4), // Warna Hijau Tosca (Sukses)
+                        padding: const EdgeInsets.symmetric(vertical: 15),
+                        elevation: 5,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                      ),
+                      child: const Text("SUDAH MINUM", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
                     ),
                   ),
                 ],
@@ -185,19 +231,51 @@ class MedicationView extends GetView<MedicationController> {
   }
 
   // ==========================================
-  // STATE 1: TAMPILAN LIST (PUTIH)
+  // STATE 1: TAMPILAN LIST (CLEAN STYLE)
   // ==========================================
   Widget _buildScheduleListView() {
     return ListView(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(24),
       children: [
-        const Text(
-          "Hari ini, 19 oktober",
-          style: TextStyle(color: Colors.grey, fontSize: 16, fontWeight: FontWeight.bold),
+        // Header Tanggal Besar
+        Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [Color(0xFF6B8EFF), Color(0xFF86A8FF)], // Senada dengan Home
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(color: const Color(0xFF6B8EFF).withOpacity(0.3), blurRadius: 15, offset: const Offset(0, 8)),
+            ],
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("Jadwal Hari Ini", style: TextStyle(color: Colors.white70, fontSize: 12)),
+                  SizedBox(height: 5),
+                  Text("Senin, 19 Oktober", style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
+                ],
+              ),
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), shape: BoxShape.circle),
+                child: const Icon(Icons.calendar_today_rounded, color: Colors.white),
+              )
+            ],
+          ),
         ),
-        const SizedBox(height: 20),
 
-        // List Obat
+        const SizedBox(height: 25),
+        const Text("Daftar Obat", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black87)),
+        const SizedBox(height: 15),
+
+        // List Obat dengan Card Style Home
         ...controller.medicationList.map((item) {
           bool isParacetamol = item['name'].toString().toLowerCase().contains('paracetamol');
           return GestureDetector(
@@ -214,14 +292,20 @@ class MedicationView extends GetView<MedicationController> {
 
         const SizedBox(height: 30),
         
-        // Tombol Tambah Manual (SUDAH DIPERBAIKI)
-        Center(
-          child: TextButton.icon(
-            onPressed: () => controller.goToAddReminder(), // Panggil fungsi di Controller
-            icon: const Icon(Icons.add, color: Colors.black87),
-            label: const Text(
-              "Tambahkan Pengingat Manual",
-              style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black87),
+        // Tombol Tambah (Floating Style)
+        SizedBox(
+          width: double.infinity,
+          height: 55,
+          child: ElevatedButton.icon(
+            onPressed: () => controller.goToAddReminder(),
+            icon: const Icon(Icons.add_circle_outline),
+            label: const Text("Tambah Jadwal Obat", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.white,
+              foregroundColor: const Color(0xFF6B8EFF),
+              elevation: 0,
+              side: const BorderSide(color: Color(0xFF6B8EFF), width: 1.5),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
             ),
           ),
         ),
@@ -230,152 +314,118 @@ class MedicationView extends GetView<MedicationController> {
   }
 
   // ==========================================
-  // STATE 2: TAMPILAN DETAIL
+  // STATE 2: TAMPILAN DETAIL (INFO JELAS)
   // ==========================================
   Widget _buildDetailView() {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(24),
       child: Column(
         children: [
-          // Info Obat
+          // Info Obat Besar
           Container(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(25),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 10)],
+              borderRadius: BorderRadius.circular(25),
+              boxShadow: [BoxShadow(color: Colors.grey.withOpacity(0.08), blurRadius: 20, offset: const Offset(0, 10))],
+            ),
+            child: Column(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(15),
+                  decoration: BoxDecoration(color: const Color(0xFF6B8EFF).withOpacity(0.1), shape: BoxShape.circle),
+                  child: const Icon(Icons.medication_rounded, size: 40, color: Color(0xFF6B8EFF)),
+                ),
+                const SizedBox(height: 15),
+                const Text("PARACETAMOL 500mg", textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.black87)),
+                const SizedBox(height: 8),
+                Text("Diminum 3x sehari • 1 Tablet", style: TextStyle(color: Colors.grey[500], fontSize: 14)),
+              ],
+            ),
+          ),
+          
+          const SizedBox(height: 20),
+          
+          // Warning Card
+          Container(
+            padding: const EdgeInsets.all(15),
+            decoration: BoxDecoration(
+              color: Colors.orange.shade50,
+              borderRadius: BorderRadius.circular(15),
+              border: Border.all(color: Colors.orange.withOpacity(0.3)),
             ),
             child: Row(
               children: [
-                Transform.rotate(
-                  angle: -0.5,
-                  child: const Icon(Icons.medication_outlined, size: 40, color: Colors.black),
-                ),
-                const SizedBox(width: 20),
+                const Icon(Icons.info_outline_rounded, color: Colors.orange),
+                const SizedBox(width: 12),
                 const Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("PARACETAMOL 500mg", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.grey)),
-                      SizedBox(height: 4),
-                      Text("Diminum 3x sehari, 1 tablet", style: TextStyle(color: Colors.grey, fontSize: 14)),
-                    ],
+                  child: Text(
+                    "Minum setelah makan untuk menghindari iritasi lambung.",
+                    style: TextStyle(color: Colors.brown, fontSize: 13),
                   ),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 20),
-          const Text(
-            "!!! Minum setelah makan untuk\nmenghindari iritasi lambung !!!",
-            textAlign: TextAlign.center,
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-          ),
-          const SizedBox(height: 40),
+
+          const SizedBox(height: 30),
           // Log Kepatuhan
           const Align(
             alignment: Alignment.centerLeft,
-            child: Text("Log kepatuhan (7 hari terakhir )", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            child: Text("Riwayat Minum Obat", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
           ),
           const SizedBox(height: 15),
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(25),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 10)],
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text("Hari ini (2/3)", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey, fontSize: 16)),
-                const SizedBox(height: 15),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    _buildStatusItem("08.00", 1),
-                    _buildStatusItem("14.05", 1),
-                    _buildStatusItem("20.00", 0),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                Divider(color: Colors.grey[300]), // Garis simple
-                const SizedBox(height: 20),
-                const Text("Kemarin (3/3)", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey, fontSize: 16)),
-                const SizedBox(height: 15),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    _buildStatusItem("08.00", 1),
-                    _buildStatusItem("14.05", 2),
-                    _buildStatusItem("20.00", 1),
-                  ],
-                ),
-              ],
-            ),
-          ),
+          
+          _buildHistoryCard("Hari Ini", [1, 1, 0]),
+          const SizedBox(height: 15),
+          _buildHistoryCard("Kemarin", [1, 2, 1]),
         ],
       ),
     );
   }
 
   // ==========================================
-  // STATE 3: TAMPILAN TAMBAH (BARU)
+  // STATE 3: TAMBAH OBAT (FORM BERSIH)
   // ==========================================
   Widget _buildAddReminderView() {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(24),
       child: Column(
         children: [
-          // Icon Header
-          const SizedBox(height: 20),
-          Container(
-            height: 80,
-            width: 80,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              shape: BoxShape.circle,
-              boxShadow: [BoxShadow(color: Colors.blue.withOpacity(0.1), blurRadius: 15)],
-            ),
-            child: const Icon(Icons.edit_calendar_rounded, size: 40, color: Colors.blue),
-          ),
-          const SizedBox(height: 30),
-
-          // Form
           Container(
             padding: const EdgeInsets.all(25),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 5)],
+              borderRadius: BorderRadius.circular(25),
+              boxShadow: [BoxShadow(color: Colors.grey.withOpacity(0.05), blurRadius: 15, offset: const Offset(0, 5))],
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text("Nama Obat", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black54)),
+                const Text("Nama Obat", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                 const SizedBox(height: 8),
                 TextField(
                   controller: controller.nameC,
                   decoration: _inputDecoration("Contoh: Paracetamol"),
                 ),
                 const SizedBox(height: 20),
-                const Text("Dosis", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black54)),
+                const Text("Dosis (mg/ml)", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                 const SizedBox(height: 8),
                 TextField(
                   controller: controller.doseC,
                   decoration: _inputDecoration("Contoh: 500mg"),
                 ),
                 const SizedBox(height: 20),
-                const Text("Waktu Minum", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black54)),
+                const Text("Waktu Pengingat", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                 const SizedBox(height: 8),
                 GestureDetector(
                   onTap: () => controller.pickTime(Get.context!),
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF5F7FA),
+                      color: const Color(0xFFFAFBFF),
                       borderRadius: BorderRadius.circular(15),
+                      border: Border.all(color: Colors.grey.shade200),
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -384,7 +434,7 @@ class MedicationView extends GetView<MedicationController> {
                           "${controller.selectedTime.value.hour.toString().padLeft(2, '0')} : ${controller.selectedTime.value.minute.toString().padLeft(2, '0')}",
                           style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                         )),
-                        const Icon(Icons.access_time_filled, color: Colors.blue),
+                        const Icon(Icons.access_time_rounded, color: Color(0xFF6B8EFF)),
                       ],
                     ),
                   ),
@@ -392,21 +442,21 @@ class MedicationView extends GetView<MedicationController> {
               ],
             ),
           ),
-          const SizedBox(height: 40),
+          const SizedBox(height: 30),
           
-          // Tombol Simpan
           SizedBox(
             width: double.infinity,
             height: 55,
             child: ElevatedButton(
               onPressed: () => controller.saveManualReminder(),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.black,
+                backgroundColor: const Color(0xFF6B8EFF),
                 foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                 elevation: 5,
+                shadowColor: const Color(0xFF6B8EFF).withOpacity(0.4),
               ),
-              child: const Text("SIMPAN PENGINGAT", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              child: const Text("SIMPAN JADWAL", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
             ),
           ),
         ],
@@ -421,8 +471,10 @@ class MedicationView extends GetView<MedicationController> {
       hintText: hint,
       hintStyle: TextStyle(color: Colors.grey[400], fontSize: 14),
       filled: true,
-      fillColor: const Color(0xFFF5F7FA),
-      border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
+      fillColor: const Color(0xFFFAFBFF),
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide(color: Colors.grey.shade200)),
+      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide(color: Colors.grey.shade200)),
+      focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: const BorderSide(color: Color(0xFF6B8EFF))),
       contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
     );
   }
@@ -434,23 +486,72 @@ class MedicationView extends GetView<MedicationController> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
-        border: isClickable ? Border.all(color: Colors.blue.withOpacity(0.3)) : null,
-        boxShadow: [BoxShadow(color: Colors.grey.withOpacity(0.1), blurRadius: 5, offset: const Offset(0, 3))],
+        border: isClickable ? Border.all(color: const Color(0xFF6B8EFF).withOpacity(0.3), width: 1.5) : null,
+        boxShadow: [BoxShadow(color: Colors.grey.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 5))],
       ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Transform.rotate(angle: -0.5, child: const Icon(Icons.medication_outlined, size: 28)),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: isClickable ? const Color(0xFF6B8EFF).withOpacity(0.1) : Colors.grey[100],
+              shape: BoxShape.circle,
+            ),
+            child: Icon(Icons.medication_liquid_rounded, size: 24, color: isClickable ? const Color(0xFF6B8EFF) : Colors.grey),
+          ),
           const SizedBox(width: 15),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, decoration: TextDecoration.underline)),
-                const SizedBox(height: 8),
-                ...schedules.map((s) => Text("• ${s['time']} ${s['taken'] ? '✓' : ''}", style: TextStyle(color: Colors.grey[700]))).toList(),
+                Text(name, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Colors.black87)),
+                const SizedBox(height: 6),
+                Wrap(
+                  spacing: 10,
+                  children: schedules.map((s) => Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.access_time, size: 12, color: Colors.grey[500]),
+                      const SizedBox(width: 4),
+                      Text("${s['time']}", style: TextStyle(color: Colors.grey[600], fontSize: 12)),
+                      if(s['taken']) ...[
+                        const SizedBox(width: 4),
+                        const Icon(Icons.check_circle, size: 12, color: Colors.green),
+                      ]
+                    ],
+                  )).toList(),
+                ),
               ],
             ),
+          ),
+          if (isClickable)
+            const Icon(Icons.chevron_right_rounded, color: Colors.grey),
+        ],
+      ),
+    );
+  }
+  
+  Widget _buildHistoryCard(String title, List<int> status) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [BoxShadow(color: Colors.grey.withOpacity(0.05), blurRadius: 10)],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+          const SizedBox(height: 15),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _buildStatusItem("08.00", status[0]),
+              _buildStatusItem("14.00", status[1]),
+              _buildStatusItem("20.00", status[2]),
+            ],
           ),
         ],
       ),
@@ -458,23 +559,19 @@ class MedicationView extends GetView<MedicationController> {
   }
 
   Widget _buildStatusItem(String time, int status) {
+    Color color = Colors.grey;
+    IconData icon = Icons.circle_outlined;
+    String text = "Belum";
+
+    if (status == 1) { color = Colors.green; icon = Icons.check_circle; text = "Diminum"; }
+    if (status == 2) { color = Colors.red; icon = Icons.cancel; text = "Terlewat"; }
+
     return Column(
       children: [
-        Row(
-          children: [
-            if (status == 1) ...[
-              const Icon(Icons.check, size: 20, color: Colors.black87),
-            ] else if (status == 2) ...[
-              const Icon(Icons.close, size: 20, color: Colors.red),
-            ] else ...[
-              Container(width: 12, height: 4, color: Colors.black87),
-              const SizedBox(width: 4),
-            ],
-            const SizedBox(width: 5),
-            Text(time, style: TextStyle(color: Colors.grey[600], fontSize: 16)),
-          ],
-        ),
-        if (status == 2) const Text("Terlewat", style: TextStyle(color: Colors.grey, fontSize: 12)),
+        Icon(icon, color: color, size: 24),
+        const SizedBox(height: 5),
+        Text(time, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+        Text(text, style: TextStyle(color: color, fontSize: 11)),
       ],
     );
   }

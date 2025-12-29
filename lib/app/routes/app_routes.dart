@@ -13,6 +13,8 @@ abstract class Routes {
   static const REGISTER = _Paths.REGISTER;
   static const KUISIONER = _Paths.KUISIONER;
   static const DOKUMEN = _Paths.DOKUMEN;
+  static const CHAT_ROOM = _Paths.CHAT_ROOM;
+  static const PROFILE = _Paths.PROFILE;
 }
 
 abstract class _Paths {
@@ -27,4 +29,6 @@ abstract class _Paths {
   static const REGISTER = '/register';
   static const KUISIONER = '/kuisioner';
   static const DOKUMEN = '/dokumen';
+  static const CHAT_ROOM = '/chat-room';
+  static const PROFILE = '/profile';
 }

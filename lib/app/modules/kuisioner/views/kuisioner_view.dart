@@ -7,180 +7,251 @@ class KuisionerView extends GetView<KuisionerController> {
 
   @override
   Widget build(BuildContext context) {
-    final Color bgPage = const Color(0xFFF5F9FC);
-    final Color primaryBlue = const Color(0xFF2F80ED);
+    // 1. Background seragam dengan Home
+    final Color bgPage = const Color(0xFFFAFBFF);
+    final Color primaryColor = const Color(0xFF2F80ED); // Biru Medis yang tenang
 
     return Scaffold(
       backgroundColor: bgPage,
+      
+      // --- APP BAR (Konsisten) ---
       appBar: AppBar(
         backgroundColor: bgPage,
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.blue),
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.black87),
           onPressed: () => Get.back(),
         ),
         title: const Text(
-          'Kuisioner\nPra-kunjungan',
-          textAlign: TextAlign.center,
+          'Kuisioner Kesehatan',
           style: TextStyle(
             color: Colors.black87,
-            fontWeight: FontWeight.bold,
-            fontSize: 16,
+            fontWeight: FontWeight.w800,
+            fontSize: 18,
           ),
         ),
       ),
+
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(24),
         child: Column(
           children: [
+            // --- HERO / INFO CARD ---
             Container(
-              margin: const EdgeInsets.only(bottom: 25),
-              child: Text(
-                "Data ini akan membantu dokter memahami perkembangan kondisi Anda lebih cepat.",
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.grey[600], fontSize: 13),
-              ),
-            ),
-            // Soal 1
-            _buildQuestionCard(
-              "1",
-              "Apa keluhan utama Anda saat ini?",
-              TextField(
-                controller: controller.complaintC,
-                maxLines: 3,
-                decoration: InputDecoration(
-                  hintText: "Contoh: Nyeri perut...",
-                  hintStyle: TextStyle(color: Colors.grey[400], fontSize: 13),
-                  border: InputBorder.none,
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                // Gradient Biru Muda ke Putih
+                gradient: LinearGradient(
+                  colors: [Colors.blue.shade50, Colors.white],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
                 ),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: Colors.blue.withOpacity(0.1)),
               ),
-            ),
-            const SizedBox(height: 20),
-            // Soal 2
-            _buildQuestionCard(
-              "2",
-              "Bagaimana skala nyeri Anda (0-10)?",
-              Column(
+              child: Row(
                 children: [
-                  Obx(
-                    () => Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: primaryColor.withOpacity(0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(Icons.assignment_turned_in_rounded, color: primaryColor, size: 30),
+                  ),
+                  const SizedBox(width: 15),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text(
-                          "0",
-                          style: TextStyle(fontSize: 12, color: Colors.grey),
+                          "Pra-Kunjungan",
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                         ),
+                        const SizedBox(height: 4),
                         Text(
-                          "${controller.painScale.value.toInt()}",
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.blue,
-                          ),
-                        ),
-                        const Text(
-                          "10",
-                          style: TextStyle(fontSize: 12, color: Colors.grey),
+                          "Bantu dokter memahami kondisi Anda lebih cepat sebelum bertemu.",
+                          style: TextStyle(color: Colors.grey[600], fontSize: 13),
                         ),
                       ],
-                    ),
-                  ),
-                  Obx(
-                    () => Slider(
-                      value: controller.painScale.value,
-                      min: 0,
-                      max: 10,
-                      divisions: 10,
-                      activeColor: Colors.blue,
-                      onChanged: (val) => controller.painScale.value = val,
                     ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 20),
-            // Soal 3
-            _buildQuestionCard(
-              "3",
-              "Efek samping obat terakhir?",
-              TextField(
-                controller: controller.sideEffectC,
-                maxLines: 2,
-                decoration: InputDecoration(
-                  hintText: "Contoh: Mual...",
-                  hintStyle: TextStyle(color: Colors.grey[400], fontSize: 13),
-                  border: InputBorder.none,
-                ),
+            
+            const SizedBox(height: 25),
+
+            // --- PERTANYAAN 1: KELUHAN ---
+            _buildSectionHeader("1. Keluhan Utama"),
+            _buildInputCard(
+              child: TextField(
+                controller: controller.complaintC,
+                maxLines: 4,
+                decoration: _inputDecoration("Ceritakan apa yang Anda rasakan... (Contoh: Nyeri perut kanan bawah sejak kemarin)"),
               ),
             ),
-            const SizedBox(height: 40),
-            // Tombol Kirim
-            Obx(
-              () => SizedBox(
-                width: double.infinity,
-                height: 55,
-                child: ElevatedButton(
-                  onPressed: controller.isLoading.value
-                      ? null
-                      : () => controller.submitKuisioner(),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: primaryBlue,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                  ),
-                  child: controller.isLoading.value
-                      ? const CircularProgressIndicator(color: Colors.white)
-                      : const Text(
-                          "Kirim Jawaban",
+
+            const SizedBox(height: 25),
+
+            // --- PERTANYAAN 2: SKALA NYERI (INTERAKTIF) ---
+            _buildSectionHeader("2. Skala Nyeri"),
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [BoxShadow(color: Colors.grey.withOpacity(0.05), blurRadius: 15, offset: const Offset(0, 5))],
+              ),
+              child: Column(
+                children: [
+                  // Visualisasi Emoticon yang Berubah-ubah
+                  Obx(() {
+                    double val = controller.painScale.value;
+                    Color statusColor;
+                    IconData statusIcon;
+
+                    if (val < 4) {
+                      statusColor = Colors.green;
+                      statusIcon = Icons.sentiment_satisfied_alt_rounded;
+                    } else if (val < 7) {
+                      statusColor = Colors.orange;
+                      statusIcon = Icons.sentiment_neutral_rounded;
+                    } else {
+                      statusColor = Colors.red;
+                      statusIcon = Icons.sentiment_very_dissatisfied_rounded;
+                    }
+
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(statusIcon, size: 50, color: statusColor),
+                        const SizedBox(width: 15),
+                        Text(
+                          "${val.toInt()}",
                           style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
+                            fontSize: 40, 
+                            fontWeight: FontWeight.bold, 
+                            color: statusColor
                           ),
                         ),
-                ),
+                        const Text("/10", style: TextStyle(fontSize: 18, color: Colors.grey)),
+                      ],
+                    );
+                  }),
+                  const SizedBox(height: 10),
+                  
+                  // Label Kiri Kanan
+                  const Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text("Tidak Sakit", style: TextStyle(fontSize: 12, color: Colors.green, fontWeight: FontWeight.bold)),
+                      Text("Sangat Sakit", style: TextStyle(fontSize: 12, color: Colors.red, fontWeight: FontWeight.bold)),
+                    ],
+                  ),
+                  
+                  // Slider Besar
+                  Obx(() => SliderTheme(
+                    data: SliderTheme.of(context).copyWith(
+                      activeTrackColor: primaryColor,
+                      inactiveTrackColor: Colors.blue.shade100,
+                      trackHeight: 8.0,
+                      thumbColor: Colors.white,
+                      thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 12.0),
+                      overlayColor: primaryColor.withOpacity(0.2),
+                      activeTickMarkColor: Colors.transparent,
+                      inactiveTickMarkColor: Colors.transparent,
+                    ),
+                    child: Slider(
+                      value: controller.painScale.value,
+                      min: 0,
+                      max: 10,
+                      divisions: 10,
+                      onChanged: (val) => controller.painScale.value = val,
+                    ),
+                  )),
+                ],
               ),
             ),
+
+            const SizedBox(height: 25),
+
+            // --- PERTANYAAN 3: EFEK SAMPING ---
+            _buildSectionHeader("3. Riwayat Obat / Efek Samping"),
+            _buildInputCard(
+              child: TextField(
+                controller: controller.sideEffectC,
+                maxLines: 3,
+                decoration: _inputDecoration("Ada alergi atau efek samping obat sebelumnya? (Jika tidak ada, kosongkan saja)"),
+              ),
+            ),
+
+            const SizedBox(height: 40),
+
+            // --- TOMBOL SUBMIT ---
+            SizedBox(
+              width: double.infinity,
+              height: 55,
+              child: Obx(() => ElevatedButton(
+                onPressed: controller.isLoading.value ? null : () => controller.submitKuisioner(),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: primaryColor,
+                  foregroundColor: Colors.white,
+                  elevation: 5,
+                  shadowColor: primaryColor.withOpacity(0.4),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                ),
+                child: controller.isLoading.value 
+                  ? const SizedBox(
+                      width: 20, height: 20, 
+                      child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)
+                    ) 
+                  : const Text("KIRIM JAWABAN", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              )),
+            ),
+            const SizedBox(height: 20),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildQuestionCard(String number, String question, Widget child) {
+  // --- HELPER WIDGETS ---
+  
+  Widget _buildSectionHeader(String title) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10, left: 5),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: Text(
+          title,
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black87),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInputCard({required Widget child}) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.symmetric(horizontal: 5),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [BoxShadow(color: Colors.grey.withOpacity(0.05), blurRadius: 15, offset: const Offset(0, 5))],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            "$number. $question",
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-          ),
-          const SizedBox(height: 15),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-            decoration: BoxDecoration(
-              color: const Color(0xFFF8F9FA),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: child,
-          ),
-        ],
-      ),
+      child: child,
+    );
+  }
+
+  InputDecoration _inputDecoration(String hint) {
+    return InputDecoration(
+      hintText: hint,
+      hintStyle: TextStyle(color: Colors.grey[400], fontSize: 14, fontStyle: FontStyle.italic),
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: BorderSide.none),
+      filled: true,
+      fillColor: Colors.white,
+      contentPadding: const EdgeInsets.all(20),
     );
   }
 }

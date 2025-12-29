@@ -8,161 +8,202 @@ class AppointmentView extends GetView<AppointmentController> {
 
   @override
   Widget build(BuildContext context) {
-    final Color bgColor = const Color(0xFFEEF2F5);
-    final Color blueLink = const Color(0xFF2F80ED);
+    // Background senada dengan Home & Medication
+    final Color bgPage = const Color(0xFFFAFBFF);
 
     return Scaffold(
-      backgroundColor: bgColor,
+      backgroundColor: bgPage,
+      
+      // --- APP BAR ---
       appBar: AppBar(
-        backgroundColor: bgColor,
+        backgroundColor: bgPage,
         elevation: 0,
         centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.black87),
+          onPressed: () => Get.offAllNamed(Routes.HOME),
+        ),
         title: const Text(
-          'Persiapan Kunjungan\nKontrol',
-          textAlign: TextAlign.center,
+          'Persiapan Kunjungan',
           style: TextStyle(
             color: Colors.black87,
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w800, // Font tebal konsisten
             fontSize: 18,
           ),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(
-              Icons.headset_mic_outlined,
-              color: Colors.black87,
-              size: 28,
-            ),
-            onPressed: () {},
-          ),
-          const SizedBox(width: 10),
-        ],
       ),
+
+      // --- BODY ---
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // --- CARD INFO DOKTER ---
+            // --- 1. TIKET DOKTER (HERO SECTION) ---
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
+                // Gradasi Teal/Hijau Tosca (Nuansa Medis & Tenang)
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF2D6A4F), Color(0xFF40916C)], 
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(25),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.grey.withOpacity(0.1),
-                    blurRadius: 6,
-                    offset: const Offset(0, 3),
+                    color: const Color(0xFF2D6A4F).withOpacity(0.4),
+                    blurRadius: 15,
+                    offset: const Offset(0, 8),
                   ),
                 ],
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: Stack(
                 children: [
-                  Text(
-                    "Kontrol dengan ${controller.doctorName}",
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 15,
+                  // Dekorasi Latar (Lingkaran transparan)
+                  Positioned(
+                    right: -20,
+                    top: -20,
+                    child: CircleAvatar(radius: 50, backgroundColor: Colors.white.withOpacity(0.1)),
+                  ),
+                  
+                  Padding(
+                    padding: const EdgeInsets.all(25),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Label Kecil
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.verified_user_outlined, color: Colors.white, size: 14),
+                              SizedBox(width: 5),
+                              Text("Terjadwal", style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        
+                        // Nama Dokter & Spesialis
+                        Text(
+                          controller.doctorName,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
+                          ),
+                        ),
+                        const Text(
+                          "Spesialis Penyakit Dalam", // Bisa didinamiskan nanti
+                          style: TextStyle(
+                            color: Colors.white70,
+                            fontSize: 14,
+                          ),
+                        ),
+                        const SizedBox(height: 25),
+                        
+                        // Info Waktu (Grid)
+                        Row(
+                          children: [
+                            _buildTicketInfo(Icons.calendar_month_rounded, "Tanggal", controller.appointmentDate),
+                            const SizedBox(width: 20),
+                            Container(width: 1, height: 40, color: Colors.white24),
+                            const SizedBox(width: 20),
+                            _buildTicketInfo(Icons.access_time_filled_rounded, "Jam", controller.appointmentTime),
+                          ],
+                        ),
+                      ],
                     ),
-                  ),
-                  const SizedBox(height: 15),
-                  Row(
-                    children: [
-                      const Icon(
-                        Icons.calendar_today_outlined,
-                        size: 18,
-                        color: Colors.blue,
-                      ),
-                      const SizedBox(width: 10),
-                      Text(
-                        controller.appointmentDate,
-                        style: TextStyle(
-                          color: Colors.grey[600],
-                          fontSize: 14,
-                          fontStyle: FontStyle.italic,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  Row(
-                    children: [
-                      const Icon(
-                        Icons.access_time,
-                        size: 18,
-                        color: Colors.blue,
-                      ),
-                      const SizedBox(width: 10),
-                      Text(
-                        controller.appointmentTime,
-                        style: TextStyle(
-                          color: Colors.grey[600],
-                          fontSize: 14,
-                          fontStyle: FontStyle.italic,
-                        ),
-                      ),
-                    ],
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 25),
-            Text(
-              "Kontrol dengan ${controller.doctorName}",
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+
+            const SizedBox(height: 30),
+            
+            // --- 2. JUDUL SECTION ---
+            const Padding(
+              padding: EdgeInsets.only(left: 5),
+              child: Text(
+                "Daftar Tugas Pasien",
+                style: TextStyle(
+                  fontWeight: FontWeight.w800, 
+                  fontSize: 18, 
+                  color: Colors.black87
+                ),
+              ),
             ),
             const SizedBox(height: 15),
 
-            // --- LIST TUGAS ---
+            // --- 3. LIST TUGAS (CARD STYLE) ---
             Obx(
               () => Column(
                 children: controller.preparationList.map((item) {
-                  return _buildTaskCard(item, blueLink);
+                  return _buildTaskCard(item);
                 }).toList(),
               ),
             ),
+            
+            const SizedBox(height: 20),
+            
+            // Footer Info
+            Center(
+              child: Text(
+                "Selesaikan tugas di atas agar\npemeriksaan berjalan lancar.",
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.grey[400], fontSize: 13),
+              ),
+            )
           ],
         ),
       ),
+
+      // --- BOTTOM NAVIGATION (CONSISTENT) ---
       bottomNavigationBar: Container(
-        height: 70,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           color: Colors.white,
-          border: Border(top: BorderSide(color: Colors.black12, width: 0.5)),
+          boxShadow: [
+             BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 20, offset: const Offset(0, -5))
+          ],
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            IconButton(
-              icon: const Icon(
-                Icons.home_filled,
-                size: 30,
-                color: Colors.black87,
-              ),
-              onPressed: () => Get.offAllNamed(Routes.HOME),
+        child: BottomNavigationBar(
+          backgroundColor: Colors.white,
+          elevation: 0,
+          type: BottomNavigationBarType.fixed,
+          currentIndex: 2, // Aktif di menu Jadwal/Janji Temu
+          selectedItemColor: const Color(0xFF2D6A4F), // Sesuaikan tema halaman (Hijau Tua)
+          unselectedItemColor: Colors.grey[400],
+          selectedFontSize: 12,
+          unselectedFontSize: 12,
+          showUnselectedLabels: true,
+          onTap: (index) {
+            if (index == 0) Get.offAllNamed(Routes.HOME);
+            if (index == 1) Get.offAllNamed(Routes.MEDICATION);
+            // Index 2 is current
+            if (index == 3) {} // Profil
+          },
+          items: const [
+            BottomNavigationBarItem(
+              icon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.home_rounded, size: 28)),
+              label: 'Beranda',
             ),
-            IconButton(
-              icon: const Icon(
-                Icons.medication_outlined,
-                size: 30,
-                color: Colors.black87,
-              ),
-              onPressed: () => Get.toNamed(Routes.MEDICATION),
+            BottomNavigationBarItem(
+              icon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.medication_rounded, size: 28)),
+              label: 'Obat',
             ),
-            IconButton(
-              icon: const Icon(
-                Icons.notifications,
-                size: 30,
-                color: Colors.black87,
-              ),
-              onPressed: () {},
+            BottomNavigationBarItem(
+              icon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.calendar_month_rounded, size: 28)),
+              label: 'Jadwal',
             ),
-            IconButton(
-              icon: const Icon(Icons.person, size: 30, color: Colors.black87),
-              onPressed: () {},
+            BottomNavigationBarItem(
+              icon: Padding(padding: EdgeInsets.only(bottom: 4), child: Icon(Icons.person_rounded, size: 28)),
+              label: 'Profil', 
             ),
           ],
         ),
@@ -170,88 +211,121 @@ class AppointmentView extends GetView<AppointmentController> {
     );
   }
 
-  Widget _buildTaskCard(Map<String, dynamic> item, Color blueLink) {
-    bool isDone = item['type'] == 'done';
+  // --- WIDGET HELPERS ---
 
+  Widget _buildTicketInfo(IconData icon, String label, String value) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(icon, color: Colors.white70, size: 14),
+            const SizedBox(width: 5),
+            Text(label, style: const TextStyle(color: Colors.white70, fontSize: 11)),
+          ],
+        ),
+        const SizedBox(height: 4),
+        Text(value, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
+      ],
+    );
+  }
+
+  Widget _buildTaskCard(Map<String, dynamic> item) {
+    bool isDone = item['type'] == 'done';
+    
     return Container(
-      width: double.infinity,
-      margin: const EdgeInsets.only(bottom: 15),
-      padding: const EdgeInsets.all(15),
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(20),
+        border: isDone ? Border.all(color: Colors.green.withOpacity(0.3)) : null,
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            blurRadius: 5,
-            offset: const Offset(0, 2),
+            color: Colors.grey.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 2.0),
+          // Icon Status (Besar & Jelas)
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: isDone ? Colors.green.withOpacity(0.1) : Colors.orange.withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
             child: Icon(
-              isDone
-                  ? Icons.check_circle_outline
-                  : Icons.radio_button_unchecked,
-              color: Colors.blue,
+              isDone ? Icons.check_rounded : Icons.priority_high_rounded,
+              color: isDone ? Colors.green : Colors.orange,
               size: 24,
             ),
           ),
+          
           const SizedBox(width: 15),
+          
           Expanded(
-            child: isDone
-                ? Text(
-                    item['text'],
-                    style: TextStyle(
-                      color: blueLink,
-                      decoration: TextDecoration.underline,
-                      decorationColor: blueLink,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Judul Tugas
+                Text(
+                  isDone ? item['text'] : item['title'],
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                    color: isDone ? Colors.grey[600] : Colors.black87,
+                    decoration: isDone ? TextDecoration.lineThrough : null,
+                  ),
+                ),
+                
+                // Deskripsi / Status
+                if (!isDone) ...[
+                  const SizedBox(height: 6),
+                  Text(
+                    item['status'],
+                    style: TextStyle(color: Colors.grey[500], fontSize: 13),
+                  ),
+                  const SizedBox(height: 15),
+                  
+                  // Tombol Aksi (Jika ada route)
+                  if (item.containsKey('route'))
+                    SizedBox(
+                      height: 40,
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          Get.toNamed(item['route']);
+                        },
+                        icon: const Icon(Icons.edit_document, size: 16),
+                        label: const Text("ISI SEKARANG"),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.orange, // Warna Urgent tapi ramah
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          textStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                        ),
+                      ),
+                    )
+                ],
+                
+                // Pesan Selesai
+                if (isDone && item['isLink'] == false)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: Row(
+                      children: const [
+                        Icon(Icons.thumb_up_alt_outlined, size: 14, color: Colors.green),
+                        SizedBox(width: 5),
+                        Text("Terima kasih, data sudah diterima.", style: TextStyle(color: Colors.green, fontSize: 12)),
+                      ],
                     ),
                   )
-                : Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        item['title'],
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
-                          color: Colors.black87,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        item['status'],
-                        style: TextStyle(color: Colors.grey[600], fontSize: 13),
-                      ),
-                      const SizedBox(height: 10),
-                      Align(
-                        alignment: Alignment.centerRight,
-                        // --- TOMBOL KLIK DI SINI ---
-                        child: GestureDetector(
-                          onTap: () {
-                            if (item.containsKey('route')) {
-                              Get.toNamed(item['route']);
-                            }
-                          },
-                          child: Text(
-                            item['actionText'],
-                            style: TextStyle(
-                              color: blueLink,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 13,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+              ],
+            ),
           ),
         ],
       ),

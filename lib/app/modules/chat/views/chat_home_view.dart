@@ -1,152 +1,165 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/chat_controller.dart';
-import 'chat_room_view.dart';
+import '../../../routes/app_pages.dart';
 
 class ChatHomeView extends GetView<ChatController> {
   const ChatHomeView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // Pastikan Controller sudah di-put di Binding sebelumnya
-    // atau gunakan Get.put(ChatController()) jika testing tanpa binding.
+    // 1. Background Seragam
+    final Color bgPage = const Color(0xFFFAFBFF);
+    final Color primaryColor = const Color(0xFF2F80ED);
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: bgPage,
+
+      // --- APP BAR ---
       appBar: AppBar(
-        title: const Text(
-          "Pusat Bantuan",
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-        ),
-        backgroundColor: Colors.white,
+        backgroundColor: bgPage,
         elevation: 0,
+        centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.blue),
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.black87),
           onPressed: () => Get.back(),
         ),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // --- Section 1: Input Pertanyaan Awal ---
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Colors.grey[50],
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.grey.shade200),
-              ),
-              child: Column(
-                children: [
-                  const Text(
-                    "Punya pertanyaan seputar perawatan Anda?",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                  ),
-                  const SizedBox(height: 15),
-                  TextField(
-                    decoration: InputDecoration(
-                      hintText: "[Ketik Pertanyaan Anda]",
-                      hintStyle: TextStyle(color: Colors.grey.shade400),
-                      filled: true,
-                      fillColor: Colors.white,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide(color: Colors.grey.shade300),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 15,
-                        vertical: 10,
-                      ),
-                    ),
-                    // Opsional: Bisa langsung kirim ke chat jika di-enter
-                    onSubmitted: (val) {
-                      if (val.isNotEmpty) {
-                        controller.messages
-                            .clear(); // Reset chat lama (opsional)
-                        controller.sendMessage(val);
-                        Get.to(() => const ChatRoomView());
-                      }
-                    },
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 25),
-            const Text(
-              "Atau Pilih Salah Satu Opsi",
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-            ),
-            const SizedBox(height: 15),
-
-            // --- Section 2: Tombol Pilihan (AI vs Perawat) ---
-            Row(
-              children: [
-                // Tombol AI
-                Expanded(
-                  child: _buildOptionCard(
-                    icon: Icons.smart_toy_outlined,
-                    title: "AI",
-                    subtitle: "Tanya Asisten AI",
-                    onTap: () {
-                      // Reset state ke mode AI
-                      controller.isNurseJoined.value = false;
-                      Get.to(() => const ChatRoomView());
-                    },
-                  ),
-                ),
-                const SizedBox(width: 15),
-                // Tombol Perawat
-                Expanded(
-                  child: _buildOptionCard(
-                    icon: Icons.medical_services_outlined,
-                    title: "Tim\nPerawat",
-                    subtitle: "Hubungi Tim\nPerawat",
-                    onTap: () {
-                      // Langsung trigger logika perawat
-                      controller.connectToNurse();
-                      Get.to(() => const ChatRoomView());
-                    },
-                  ),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 25),
-            const Text(
-              "Riwayat Percakapan Anda",
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-            ),
-            const SizedBox(height: 15),
-
-            // --- Section 3: Riwayat (Dummy) ---
-            _buildHistoryItem("Cara Merawat Luka Pasca Operasi"),
-            _buildHistoryItem("Pola Makan & Istirahat Pasca Operasi"),
-          ],
+        title: const Text(
+          'Konsultasi Medis',
+          style: TextStyle(
+            color: Colors.black87,
+            fontWeight: FontWeight.w800,
+            fontSize: 18,
+          ),
         ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.mark_chat_read_outlined, color: primaryColor),
+            onPressed: () {
+              // Fitur tandai semua dibaca (opsional)
+            },
+          )
+        ],
+      ),
+
+      body: Column(
+        children: [
+          // --- 1. SEARCH BAR ---
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 15),
+            color: bgPage,
+            child: TextField(
+              decoration: InputDecoration(
+                hintText: "Cari Dokter atau Perawat...",
+                hintStyle: TextStyle(color: Colors.grey[400], fontSize: 14),
+                prefixIcon: Icon(Icons.search_rounded, color: Colors.grey[400]),
+                filled: true,
+                fillColor: Colors.white,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: BorderSide.none,
+                ),
+                contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: BorderSide(color: Colors.grey.shade200),
+                ),
+              ),
+            ),
+          ),
+
+          // --- 2. LIST DOKTER / CHAT ---
+          Expanded(
+            child: ListView.builder(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              itemCount: 5, // Dummy data, nanti pakai controller.chats.length
+              itemBuilder: (context, index) {
+                // DATA DUMMY (Nanti ganti dengan data real dari Controller/Firebase)
+                final List<Map<String, dynamic>> dummyChats = [
+                  {
+                    "name": "Dr. Andi Setiawan",
+                    "role": "Spesialis Penyakit Dalam",
+                    "message": "Baik pak, jangan lupa obatnya diminum...",
+                    "time": "10:30",
+                    "unread": 2,
+                    "isOnline": true,
+                    "image": "https://i.pravatar.cc/150?img=11" // Ganti asset lokal jika perlu
+                  },
+                  {
+                    "name": "Ns. Siti Aminah",
+                    "role": "Perawat Pendamping",
+                    "message": "Hasil labnya sudah keluar bu?",
+                    "time": "Kemarin",
+                    "unread": 0,
+                    "isOnline": true,
+                    "image": "https://i.pravatar.cc/150?img=5"
+                  },
+                  {
+                    "name": "Dr. Budi Santoso",
+                    "role": "Dokter Umum",
+                    "message": "Oke siap, terima kasih kembali.",
+                    "time": "Senin",
+                    "unread": 0,
+                    "isOnline": false,
+                    "image": "https://i.pravatar.cc/150?img=3"
+                  },
+                ];
+
+                // Biar list berulang kalau item > 3
+                var chat = dummyChats[index % dummyChats.length];
+
+                return _buildChatCard(
+                  name: chat['name'],
+                  role: chat['role'],
+                  message: chat['message'],
+                  time: chat['time'],
+                  unreadCount: chat['unread'],
+                  isOnline: chat['isOnline'],
+                  imageUrl: chat['image'],
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+      
+      // Floating Action Button (Opsional: Mulai Chat Baru)
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          // Navigasi ke pilih kontak baru
+        },
+        backgroundColor: primaryColor,
+        icon: const Icon(Icons.add_comment_rounded),
+        label: const Text("Chat Baru"),
       ),
     );
   }
 
-  Widget _buildOptionCard({
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required VoidCallback onTap,
+  // --- WIDGET HELPERS ---
+
+  Widget _buildChatCard({
+    required String name,
+    required String role,
+    required String message,
+    required String time,
+    required int unreadCount,
+    required bool isOnline,
+    required String imageUrl,
   }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
+    return GestureDetector(
+      onTap: () {
+        // Navigasi ke Chat Room
+        Get.toNamed(Routes.CHAT_ROOM, arguments: {
+          'name': name,
+          'status': isOnline ? 'Online' : 'Offline',
+        });
+      },
       child: Container(
-        height: 110,
-        padding: const EdgeInsets.all(12),
+        margin: const EdgeInsets.only(bottom: 15),
+        padding: const EdgeInsets.all(15),
         decoration: BoxDecoration(
           color: Colors.white,
-          border: Border.all(color: Colors.grey.shade300),
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
               color: Colors.grey.withOpacity(0.05),
@@ -154,35 +167,117 @@ class ChatHomeView extends GetView<ChatController> {
               offset: const Offset(0, 4),
             ),
           ],
+          // Border indikator kalau ada pesan belum dibaca
+          border: unreadCount > 0 
+            ? Border.all(color: Colors.blue.withOpacity(0.3), width: 1)
+            : Border.all(color: Colors.transparent),
         ),
         child: Row(
           children: [
-            Container(
-              width: 50,
-              height: 50,
-              decoration: BoxDecoration(
-                color: Colors.blue.shade50,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Center(child: Icon(icon, color: Colors.blue)),
+            // AVATAR AREA
+            Stack(
+              children: [
+                Container(
+                  width: 60,
+                  height: 60,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[200],
+                    shape: BoxShape.circle,
+                    image: DecorationImage(
+                      image: NetworkImage(imageUrl), // Bisa ganti AssetImage
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+                // Indikator Online
+                if (isOnline)
+                  Positioned(
+                    right: 0,
+                    bottom: 0,
+                    child: Container(
+                      width: 16,
+                      height: 16,
+                      decoration: BoxDecoration(
+                        color: Colors.green,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white, width: 2.5),
+                      ),
+                    ),
+                  ),
+              ],
             ),
-            const SizedBox(width: 12),
-            Flexible(
+            
+            const SizedBox(width: 15),
+
+            // TEXT CONTENT AREA
+            Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                    ),
+                  // Nama & Role
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          name,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: Colors.black87,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      Text(
+                        time,
+                        style: TextStyle(
+                          color: unreadCount > 0 ? Colors.blue : Colors.grey[400],
+                          fontSize: 12,
+                          fontWeight: unreadCount > 0 ? FontWeight.bold : FontWeight.normal,
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    subtitle,
-                    style: const TextStyle(fontSize: 11, color: Colors.grey),
+                    role,
+                    style: TextStyle(color: Colors.blue[300], fontSize: 12, fontWeight: FontWeight.w500),
+                  ),
+                  const SizedBox(height: 6),
+                  
+                  // Pesan Terakhir
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          message,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: unreadCount > 0 ? Colors.black87 : Colors.grey[500],
+                            fontWeight: unreadCount > 0 ? FontWeight.bold : FontWeight.normal,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                      
+                      // Badge Unread Count
+                      if (unreadCount > 0)
+                        Container(
+                          margin: const EdgeInsets.only(left: 10),
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: Colors.red,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Text(
+                            "$unreadCount",
+                            style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                    ],
                   ),
                 ],
               ),
@@ -190,27 +285,6 @@ class ChatHomeView extends GetView<ChatController> {
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildHistoryItem(String text) {
-    return Container(
-      width: double.infinity,
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            blurRadius: 5,
-            offset: const Offset(0, 2),
-          ),
-        ],
-        border: Border.all(color: Colors.grey.shade100),
-      ),
-      child: Text(text, style: const TextStyle(fontWeight: FontWeight.w500)),
     );
   }
 }
