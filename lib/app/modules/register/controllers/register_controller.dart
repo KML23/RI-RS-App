@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart'; // <--- PENTING: Untuk SystemChannels
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:firebase_auth/firebase_auth.dart'; // Import Auth
-import 'package:cloud_firestore/cloud_firestore.dart'; // Import Firestore
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class RegisterController extends GetxController {
   var currentStep = 1.obs;
@@ -15,12 +16,12 @@ class RegisterController extends GetxController {
   var isPassHidden = true.obs;
   var isConfirmHidden = true.obs;
   var isTermsAccepted = false.obs;
-  var isLoading = false.obs; // Tambahan loading state
+  var isLoading = false.obs;
 
   Future<void> selectDate(BuildContext context) async {
     DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: DateTime(1990), // Default lebih lama biar enak
+      initialDate: DateTime(1990),
       firstDate: DateTime(1900),
       lastDate: DateTime.now(),
     );
@@ -46,7 +47,7 @@ class RegisterController extends GetxController {
     }
   }
 
-  // --- FUNGSI REGISTRASI ASLI ---
+  // --- FUNGSI REGISTRASI (ANTI CRASH VERSION) ---
   void submitRegistration() async {
     if (!isTermsAccepted.value) {
       Get.snackbar("Info", "Anda harus menyetujui syarat & ketentuan", backgroundColor: Colors.orange, colorText: Colors.white);
@@ -61,7 +62,7 @@ class RegisterController extends GetxController {
     try {
       isLoading.value = true;
 
-      // 1. Trik: Ubah RM jadi Email format (karena Firebase wajib email)
+      // 1. Buat Email Format dari RM
       String dummyEmail = "${rmC.text.trim()}@rs-app.com";
 
       // 2. Buat Akun di Firebase Authentication
@@ -71,18 +72,30 @@ class RegisterController extends GetxController {
       );
 
       // 3. Simpan Detail Profil ke Cloud Firestore
-      // Kita set nama default dulu, nanti bisa diedit
       await FirebaseFirestore.instance.collection('users').doc(userCredential.user!.uid).set({
         'rm': rmC.text.trim(),
         'dob': dobC.text,
-        'name': "Pasien Baru", // Default name
+        'name': "Pasien Baru", // Default, nanti bisa diubah di profil
         'created_at': DateTime.now().toIso8601String(),
       });
 
       // 4. Sukses
       Get.snackbar("Sukses", "Akun berhasil dibuat! Silakan Login.", backgroundColor: Colors.green, colorText: Colors.white);
       
-      // Logout otomatis biar user login ulang (biar flow aman)
+      // --- UPDATE PENTING: MENCEGAH CRASH KEYBOARD ---
+      
+      // Cara 1: Unfocus standar
+      FocusManager.instance.primaryFocus?.unfocus();
+      
+      // Cara 2: Paksa sistem Android menutup input channel (LEBIH KUAT)
+      // Ini memastikan keyboard benar-benar mati sebelum halaman dihancurkan
+      SystemChannels.textInput.invokeMethod('TextInput.hide');
+      
+      // Beri waktu napas 1.5 detik agar animasi transisi keyboard selesai total
+      // Jangan dikurangi durasinya, ini kunci kestabilan emulator
+      await Future.delayed(const Duration(milliseconds: 1500)); 
+
+      // 5. Logout & Pindah Halaman
       await FirebaseAuth.instance.signOut();
       Get.offAllNamed('/login');
 
@@ -101,10 +114,5 @@ class RegisterController extends GetxController {
 
   @override
   void onClose() {
-    rmC.dispose();
-    dobC.dispose();
-    passC.dispose();
-    confirmPassC.dispose();
-    super.onClose();
   }
 }
