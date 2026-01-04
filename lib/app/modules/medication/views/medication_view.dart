@@ -78,7 +78,6 @@ class MedicationView extends GetView<MedicationController> {
       }),
 
       // --- BOTTOM NAVIGATION (MIMIC HOME STYLE) ---
-      // Agar user merasa tidak "tersesat", kita samakan style-nya
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: Colors.white,
@@ -100,7 +99,7 @@ class MedicationView extends GetView<MedicationController> {
             if (index == 0) Get.offAllNamed(Routes.HOME);
             // Index 1 is current
             if (index == 2) Get.offAllNamed(Routes.APPOINTMENT);
-            if (index == 3) {} // Profil
+            if (index == 3) Get.toNamed(Routes.PROFILE); // Ke Profil
           },
           items: const [
             BottomNavigationBarItem(
@@ -275,20 +274,36 @@ class MedicationView extends GetView<MedicationController> {
         const Text("Daftar Obat", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black87)),
         const SizedBox(height: 15),
 
-        // List Obat dengan Card Style Home
-        ...controller.medicationList.map((item) {
-          bool isParacetamol = item['name'].toString().toLowerCase().contains('paracetamol');
-          return GestureDetector(
-            onTap: () {
-              if (isParacetamol) controller.showDetail(item['name']);
-            },
-            child: _buildMedicineCard(
-              name: item['name'],
-              schedules: item['schedules'],
-              isClickable: isParacetamol,
-            ),
+        // List Obat dengan Data Real Firestore (Updated)
+        Obx(() {
+          if (controller.isLoading.value) {
+            return const Center(child: Padding(
+              padding: EdgeInsets.all(20.0),
+              child: CircularProgressIndicator(),
+            ));
+          }
+          if (controller.medicationList.isEmpty) {
+            return const Center(child: Padding(
+              padding: EdgeInsets.all(20.0),
+              child: Text("Belum ada jadwal obat", style: TextStyle(color: Colors.grey)),
+            ));
+          }
+          return Column(
+            children: controller.medicationList.map((item) {
+              return GestureDetector(
+                onTap: () {
+                  // Kirim Doc ID saat klik detail agar bisa dihapus
+                  controller.showDetail(item['name'], docId: item['id']);
+                },
+                child: _buildMedicineCard(
+                  name: item['name'],
+                  schedules: item['schedules'],
+                  isClickable: true, // Semua bisa diklik sekarang
+                ),
+              );
+            }).toList(),
           );
-        }).toList(),
+        }),
 
         const SizedBox(height: 30),
         
@@ -337,9 +352,10 @@ class MedicationView extends GetView<MedicationController> {
                   child: const Icon(Icons.medication_rounded, size: 40, color: Color(0xFF6B8EFF)),
                 ),
                 const SizedBox(height: 15),
-                const Text("PARACETAMOL 500mg", textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.black87)),
+                // Nama obat bisa diambil dari list atau variable lain jika perlu lebih dinamis
+                const Text("DETAIL OBAT", textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.black87)),
                 const SizedBox(height: 8),
-                Text("Diminum 3x sehari • 1 Tablet", style: TextStyle(color: Colors.grey[500], fontSize: 14)),
+                Text("Cek kembali dosis dan waktu minum", style: TextStyle(color: Colors.grey[500], fontSize: 14)),
               ],
             ),
           ),
@@ -360,7 +376,7 @@ class MedicationView extends GetView<MedicationController> {
                 const SizedBox(width: 12),
                 const Expanded(
                   child: Text(
-                    "Minum setelah makan untuk menghindari iritasi lambung.",
+                    "Pastikan minum sesuai anjuran dokter.",
                     style: TextStyle(color: Colors.brown, fontSize: 13),
                   ),
                 ),
@@ -378,7 +394,22 @@ class MedicationView extends GetView<MedicationController> {
           
           _buildHistoryCard("Hari Ini", [1, 1, 0]),
           const SizedBox(height: 15),
-          _buildHistoryCard("Kemarin", [1, 2, 1]),
+          
+          // TOMBOL HAPUS (BARU DITAMBAHKAN)
+          SizedBox(
+            width: double.infinity,
+            height: 50,
+            child: TextButton.icon(
+              onPressed: () {
+                // Panggil fungsi hapus dengan ID dokumen yang sedang aktif
+                controller.deleteMedication(controller.currentDocId.value);
+              },
+              icon: const Icon(Icons.delete_forever, color: Colors.red),
+              label: const Text("Hapus Jadwal Obat Ini", style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+            ),
+          ),
+          
+          const SizedBox(height: 20),
         ],
       ),
     );
@@ -444,11 +475,11 @@ class MedicationView extends GetView<MedicationController> {
           ),
           const SizedBox(height: 30),
           
-          SizedBox(
+          Obx(() => SizedBox(
             width: double.infinity,
             height: 55,
             child: ElevatedButton(
-              onPressed: () => controller.saveManualReminder(),
+              onPressed: controller.isLoading.value ? null : () => controller.saveManualReminder(),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF6B8EFF),
                 foregroundColor: Colors.white,
@@ -456,9 +487,11 @@ class MedicationView extends GetView<MedicationController> {
                 elevation: 5,
                 shadowColor: const Color(0xFF6B8EFF).withOpacity(0.4),
               ),
-              child: const Text("SIMPAN JADWAL", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              child: controller.isLoading.value 
+                  ? const CircularProgressIndicator(color: Colors.white)
+                  : const Text("SIMPAN JADWAL", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
             ),
-          ),
+          )),
         ],
       ),
     );

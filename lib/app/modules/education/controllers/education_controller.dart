@@ -1,95 +1,53 @@
 import 'package:get/get.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class EducationController extends GetxController {
+  FirebaseFirestore firestore = FirebaseFirestore.instance;
   
-  var isDetailOpen = false.obs;
-  var selectedGuide = <String, dynamic>{}.obs;
-
-  final List<Map<String, dynamic>> educationList = [
-    {
-      "id": 1,
-      "title": "Perawatan Luka Pasca-Operasi",
-      "category": "Medis",
-      "duration": "5 Menit",
-      "thumbnail_color": 0xFF4FACFE,
-      "description": "Panduan lengkap menjaga kebersihan luka agar cepat kering.",
-      "steps": [
-        {
-          "title": "Persiapan Alat",
-          "subtitle": "Kassa, NaCl, Plester",
-          "description": "Siapkan semua alat di atas meja yang bersih. Cuci tangan dengan sabun.",
-        },
-        {
-          "title": "Membersihkan Luka",
-          "subtitle": "Teknik usap yang benar",
-          "description": "Usap luka dari arah dalam ke luar menggunakan kassa yang dibasahi NaCl.",
-        },
-      ]
-    },
-    {
-      "id": 2,
-      "title": "Cara Booking Jadwal Dokter",
-      "category": "Aplikasi",
-      "duration": "2 Menit",
-      "thumbnail_color": 0xFFFFA600,
-      "description": "Langkah mudah membuat janji temu tanpa antri.",
-      "steps": [
-        {
-          "title": "Pilih Menu Janji Temu",
-          "subtitle": "Di halaman utama",
-          "description": "Tekan menu 'Janji Temu' berwarna hijau tua di halaman beranda.",
-        },
-        {
-          "title": "Pilih Dokter & Tanggal",
-          "subtitle": "Sesuaikan jadwal",
-          "description": "Pilih dokter spesialis yang tersedia dan tanggal kunjungan yang diinginkan.",
-        },
-         {
-          "title": "Konfirmasi",
-          "subtitle": "Dapatkan kode booking",
-          "description": "Setelah konfirmasi, Anda akan mendapatkan QR Code untuk check-in di RS.",
-        },
-      ]
-    },
-    {
-      "id": 3,
-      "title": "Aturan Minum Obat",
-      "category": "Edukasi Obat",
-      "duration": "3 Menit",
-      "thumbnail_color": 0xFF00C853,
-      "description": "Memahami arti '3x1 sesudah makan' dan lainnya.",
-      "steps": []
-    },
-    {
-      "id": 4,
-      "title": "Cara Menggunakan Cek Gejala",
-      "category": "Aplikasi",
-      "duration": "4 Menit",
-      "thumbnail_color": 0xFF6A0572,
-      "description": "Deteksi dini kondisi anak menggunakan AI foto.",
-      "steps": []
-    },
-  ].obs;
+  // Data Artikel Reactive
+  var educationList = <Map<String, dynamic>>[].obs;
+  var isLoading = true.obs;
 
   @override
   void onInit() {
     super.onInit();
-    if (Get.arguments != null && Get.arguments['autoOpenId'] != null) {
-      int idToOpen = Get.arguments['autoOpenId'];
-      var guide = educationList.firstWhere((element) => element['id'] == idToOpen, orElse: () => {});
-      if (guide.isNotEmpty) openDetail(guide);
+    fetchArticles();
+  }
+
+  // --- AMBIL DATA DARI FIRESTORE ---
+  void fetchArticles() async {
+    try {
+      isLoading.value = true;
+      // Ambil semua dokumen di koleksi 'articles'
+      QuerySnapshot snapshot = await firestore.collection('articles').get();
+      
+      var dataList = snapshot.docs.map((doc) {
+        var data = doc.data() as Map<String, dynamic>;
+        // Kita rapikan datanya biar aman
+        return {
+          "id": doc.id,
+          "title": data['title'] ?? "Tanpa Judul",
+          "category": data['category'] ?? "Umum",
+          "readTime": data['read_time'] ?? "3 min", // Pastikan field di firestore 'read_time'
+          "image": data['image_url'] ?? "", // Pastikan field di firestore 'image_url'
+          "description": data['description'] ?? "Tidak ada deskripsi singkat.",
+          // Jika nanti ada steps (array), ambil juga
+          "steps": data['steps'] ?? [] 
+        };
+      }).toList();
+
+      educationList.assignAll(dataList);
+      
+    } catch (e) {
+      print("Error ambil artikel: $e");
+      Get.snackbar("Error", "Gagal memuat artikel: $e");
+    } finally {
+      isLoading.value = false;
     }
   }
 
-  void openDetail(Map<String, dynamic> guide) {
-    selectedGuide.value = guide;
-    isDetailOpen.value = true;
-  }
-
-  // --- PERBAIKAN DI SINI ---
-  void closeDetail() {
-    isDetailOpen.value = false;
-    // JANGAN PAKA selectedGuide.clear(); KARENA AKAN MENGHAPUS DATA ASLI DI LIST
-    selectedGuide.value = {}; // Ganti dengan map kosong baru agar data asli aman
+  // Fungsi Refresh (Opsional, buat narik layar ke bawah)
+  Future<void> refreshData() async {
+    fetchArticles();
   }
 }

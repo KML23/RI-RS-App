@@ -32,13 +32,11 @@ class KuisionerController extends GetxController {
     await Future.delayed(const Duration(seconds: 2));
     isLoading.value = false;
 
-    // --- LOGIKA UTAMA: KOMUNIKASI ANTAR CONTROLLER ---
-    // Mencari AppointmentController yang sedang aktif di memori
-    // Pastikan AppointmentController SUDAH di-put (diakses) sebelumnya
+    // --- LOGIKA BARU: UPDATE STATUS KE FIRESTORE ---
+    // Mencari AppointmentController yang sedang aktif dan panggil fungsi update-nya
     if (Get.isRegistered<AppointmentController>()) {
-      Get.find<AppointmentController>().markKuisionerAsDone();
+      Get.find<AppointmentController>().updateKuisionerStatus();
     } else {
-      // Fallback jika user membuka kuisioner langsung tanpa lewat appointment (jarang terjadi)
       print("AppointmentController belum di-load");
     }
 

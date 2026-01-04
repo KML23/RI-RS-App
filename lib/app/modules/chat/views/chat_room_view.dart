@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:cloud_firestore/cloud_firestore.dart'; 
 import '../controllers/chat_controller.dart';
 
 class ChatRoomView extends GetView<ChatController> {
@@ -9,14 +10,12 @@ class ChatRoomView extends GetView<ChatController> {
   Widget build(BuildContext context) {
     // Ambil Data dari Halaman Sebelumnya (Arguments)
     final Map<String, dynamic> args = Get.arguments ?? {
-      'name': 'Dr. Dokter', 
+      'name': 'Tim Medis', 
       'status': 'Online'
     };
     
     final String doctorName = args['name'];
-    final String status = args['status'];
-    final bool isOnline = status == 'Online';
-
+    
     final Color bgPage = const Color(0xFFFAFBFF);
 
     return Scaffold(
@@ -25,7 +24,7 @@ class ChatRoomView extends GetView<ChatController> {
       // --- 1. HEADER CHAT ---
       appBar: AppBar(
         backgroundColor: Colors.white,
-        elevation: 1, // Sedikit shadow biar terpisah dari chat area
+        elevation: 1,
         shadowColor: Colors.grey.shade100,
         leadingWidth: 50,
         leading: IconButton(
@@ -34,28 +33,24 @@ class ChatRoomView extends GetView<ChatController> {
         ),
         title: Row(
           children: [
-            // Avatar Kecil di Header
             Stack(
               children: [
                 CircleAvatar(
                   radius: 20,
-                  backgroundColor: Colors.grey[200],
-                  child: const Icon(Icons.person, color: Colors.grey),
-                  // foregroundImage: NetworkImage('url_foto_jika_ada'),
+                  backgroundColor: Colors.blue.shade100,
+                  child: const Icon(Icons.support_agent_rounded, color: Colors.blue),
                 ),
-                if (isOnline)
-                  Positioned(
-                    right: 0, 
-                    bottom: 0,
-                    child: Container(
-                      width: 12, height: 12,
-                      decoration: BoxDecoration(
-                        color: Colors.green,
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white, width: 2),
-                      ),
+                Positioned(
+                  right: 0, bottom: 0,
+                  child: Container(
+                    width: 12, height: 12,
+                    decoration: BoxDecoration(
+                      color: Colors.green,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white, width: 2),
                     ),
-                  )
+                  ),
+                )
               ],
             ),
             const SizedBox(width: 12),
@@ -66,98 +61,70 @@ class ChatRoomView extends GetView<ChatController> {
                   Text(
                     doctorName,
                     style: const TextStyle(color: Colors.black87, fontSize: 16, fontWeight: FontWeight.bold),
-                    overflow: TextOverflow.ellipsis,
                   ),
-                  Text(
-                    status,
-                    style: TextStyle(
-                      color: isOnline ? Colors.green : Colors.grey, 
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500
-                    ),
+                  const Text(
+                    "Online",
+                    style: TextStyle(color: Colors.green, fontSize: 12, fontWeight: FontWeight.w500),
                   ),
                 ],
               ),
             ),
           ],
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.call_rounded, color: Colors.blue),
-            onPressed: () {
-              // Fitur Telepon (Opsional)
-              Get.snackbar("Info", "Fitur panggilan suara akan segera hadir.");
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.videocam_rounded, color: Colors.blue),
-            onPressed: () {
-              // Fitur Video Call (Opsional)
-            },
-          ),
-        ],
       ),
 
       body: Column(
         children: [
-          // --- 2. AREA CHAT (MESSAGES) ---
+          // --- 2. AREA CHAT (REAL TIME) ---
           Expanded(
-            child: ListView(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-              children: [
-                // Tanggal Pemisah
-                _buildDateSeparator("Hari Ini"),
-                
-                // Pesan Dokter (Kiri)
-                _buildMessageBubble(
-                  message: "Selamat pagi, Pak. Bagaimana perkembangan nyeri sendinya hari ini?",
-                  time: "08:30",
-                  isSender: false,
-                ),
+            child: Obx(() {
+              if (controller.messages.isEmpty) {
+                return Center(
+                  child: Text(
+                    "Mulai konsultasi dengan Tim Medis...", 
+                    style: TextStyle(color: Colors.grey[400])
+                  ),
+                );
+              }
+              
+              return ListView.builder(
+                reverse: true, // Biar pesan baru muncul di bawah (tapi listnya dibalik)
+                padding: const EdgeInsets.all(20),
+                itemCount: controller.messages.length,
+                itemBuilder: (context, index) {
+                  var msg = controller.messages[index];
+                  
+                  // Format Waktu
+                  String timeStr = "";
+                  if (msg['time'] != null && msg['time'] is Timestamp) {
+                     DateTime dt = (msg['time'] as Timestamp).toDate();
+                     timeStr = "${dt.hour.toString().padLeft(2,'0')}:${dt.minute.toString().padLeft(2,'0')}";
+                  }
 
-                // Pesan User (Kanan)
-                _buildMessageBubble(
-                  message: "Selamat pagi Dok. Alhamdulillah sudah agak mendingan setelah minum obat.",
-                  time: "08:32",
-                  isSender: true,
-                ),
-
-                // Pesan Dokter (Kiri)
-                _buildMessageBubble(
-                  message: "Syukurlah. Jangan lupa tetap kompres hangat ya kalau masih terasa kaku.",
-                  time: "08:33",
-                  isSender: false,
-                ),
-                
-                 // Pesan User (Kanan - Panjang)
-                _buildMessageBubble(
-                  message: "Baik Dok, akan saya lakukan. Nanti sore saya kirim foto hasil tensi darah ya.",
-                  time: "08:35",
-                  isSender: true,
-                ),
-              ],
-            ),
+                  return _buildMessageBubble(
+                    message: msg['text'],
+                    time: timeStr,
+                    isSender: msg['is_user'], // True = User (Kanan)
+                  );
+                },
+              );
+            }),
           ),
 
-          // --- 3. INPUT AREA (BAGIAN BAWAH) ---
+          // --- 3. INPUT AREA ---
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
               color: Colors.white,
-              boxShadow: [
-                BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, -5))
-              ],
+              boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, -5))],
             ),
             child: SafeArea(
               child: Row(
                 children: [
-                  // Tombol Tambah (Attachment)
                   IconButton(
                     onPressed: () {},
                     icon: const Icon(Icons.add_circle_outline_rounded, color: Colors.grey, size: 28),
                   ),
-                  
-                  // Kolom Ketik
                   Expanded(
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -166,6 +133,7 @@ class ChatRoomView extends GetView<ChatController> {
                         borderRadius: BorderRadius.circular(25),
                       ),
                       child: TextField(
+                        controller: controller.textEditingController,
                         decoration: InputDecoration(
                           hintText: "Tulis pesan...",
                           hintStyle: TextStyle(color: Colors.grey[500]),
@@ -175,10 +143,7 @@ class ChatRoomView extends GetView<ChatController> {
                       ),
                     ),
                   ),
-                  
                   const SizedBox(width: 10),
-                  
-                  // Tombol Kirim (Besar & Biru)
                   Container(
                     decoration: const BoxDecoration(
                       color: Color(0xFF2F80ED),
@@ -186,7 +151,7 @@ class ChatRoomView extends GetView<ChatController> {
                     ),
                     child: IconButton(
                       onPressed: () {
-                         // Aksi kirim pesan
+                         controller.sendMessage(controller.textEditingController.text);
                       },
                       icon: const Icon(Icons.send_rounded, color: Colors.white, size: 22),
                     ),
@@ -200,25 +165,6 @@ class ChatRoomView extends GetView<ChatController> {
     );
   }
 
-  // --- WIDGET HELPERS ---
-
-  Widget _buildDateSeparator(String date) {
-    return Center(
-      child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 20),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        decoration: BoxDecoration(
-          color: Colors.grey[200],
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Text(
-          date,
-          style: const TextStyle(color: Colors.black54, fontSize: 12, fontWeight: FontWeight.bold),
-        ),
-      ),
-    );
-  }
-
   Widget _buildMessageBubble({
     required String message, 
     required String time, 
@@ -228,15 +174,15 @@ class ChatRoomView extends GetView<ChatController> {
       alignment: isSender ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
-        constraints: const BoxConstraints(maxWidth: 280), // Maksimal lebar balon 70% layar
+        constraints: const BoxConstraints(maxWidth: 280),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
           color: isSender ? const Color(0xFF2F80ED) : Colors.white,
           borderRadius: BorderRadius.only(
             topLeft: const Radius.circular(20),
             topRight: const Radius.circular(20),
-            bottomLeft: isSender ? const Radius.circular(20) : const Radius.circular(0), // Ekor balon dokter
-            bottomRight: isSender ? const Radius.circular(0) : const Radius.circular(20), // Ekor balon user
+            bottomLeft: isSender ? const Radius.circular(20) : const Radius.circular(0),
+            bottomRight: isSender ? const Radius.circular(0) : const Radius.circular(20),
           ),
           boxShadow: [
             BoxShadow(color: Colors.grey.withOpacity(0.05), blurRadius: 5, offset: const Offset(0, 2))
@@ -250,7 +196,7 @@ class ChatRoomView extends GetView<ChatController> {
               style: TextStyle(
                 color: isSender ? Colors.white : Colors.black87,
                 fontSize: 15,
-                height: 1.4, // Spasi baris biar enak dibaca
+                height: 1.4,
               ),
             ),
             const SizedBox(height: 5),
